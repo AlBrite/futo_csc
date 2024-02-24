@@ -19,9 +19,10 @@ $class_id = request()->get('class');
         </style>
         
         <div id="advisor-results" class="flex items-center text-sm font-semibold gap-4 text-body-200">
-            <a href="/advisor/results" class="active">View Results</a>
-            <a href="/advisor/upload-result">Upload Results</a>
-            <a href="/advisor/cgpa-summary-result">CGPA Summary Result</a>
+            <a href="/results" class="active">View Results</a>
+            <a href="/moderator/upload-results">Upload Results</a>
+            <a href="/moderator/cgpa-summary-result">CGPA Summary Result</a>
+            <a href="/moderator/add-result">Manually Add Results</a>
         </div>
 
         <div class="w-full mt-4" x-data="{semester:'{{$semester}}', course: false, session: '{{$session}}'}">
@@ -41,9 +42,9 @@ $class_id = request()->get('class');
             <form method="get" class="flex items-end flex-wrap gap-x-2" id="result-options-form">
 
                 <div class="">
-                    <label for="session">Class</label>
+                    <label for="class">Class</label>
                     
-                    <select x-on:change="setClass" name="class" id="session" class="w-full input">
+                    <select x-on:change="setClass" name="class" id="class" class="w-full input">
                         <option value="" class>Select Class</option>
                         @if(auth()->user()->role == 'admin')
                             @foreach(\App\Models\Admin::academicSets() as $class)

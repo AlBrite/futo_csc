@@ -345,7 +345,6 @@ class CourseController extends Controller
         
             $level = $request->level;
             $semester = $request->semester;
-            $type = $request->type;
         
             return Course::getCourses($level, $semester);
     }

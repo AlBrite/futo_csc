@@ -11,49 +11,91 @@ use App\Http\Controllers\Controller;
 class ResultsController extends Controller
 {
 
-public function uploadExcel(Request $request)
-{
-    $file = $request->file('excel_file');
-    
-    
-    $data = Excel::toArray([], $file);
-
-    
-    // Store the data in the database
-    // For example:
-    $n = 0;
-    $matcher = ['REG NO.', 'NAME', 'PROGRAM','LAB','TEST','EXAM','TOTAL','GRADE','REMAINS'];
-
-    $results = [];
-
-    foreach ($data[0] as $row) {
-        // if ($n == 7) {
-        //     foreach($row as $col) {
-        //         dd($col);
-        //     }
-        //     dd($row[0], $row[1]);
-        // }'
-
-        if (!$row[1] || ($row[6] === 'TOTAL'||$row[3] === 'LAB' || $row[4] ==='TEST')) {
-            continue;
-        }
-        $tableData = [
-            'reg_no' => $row[1],
-            'practical' => $row[3],
-            'test' => $row[4],
-            'exam' => $row[5],
-            'score' => $row[6]
+    public function uploadExcel(Request $request)
+    {
+        $matcher = [
+            'Reg No.' => 'reg_no',
+            'LAB' => 'lab',
+            'TEST' => 'test',
+            'EXAM' => 'exam',
+            'TOTAL' => 'score'
         ];
-        $results[] = $tableData;
-        // dd($tableData);
 
-       
-        Result::create($tableData);
-        $n++;
+        $request->validate([
+            "level" => "required",
+            "semester" => "required",
+            "course" => "required",
+            "session" => "required"
+        ]);
+        $level = $request->level;
+        $semester = $request->semester;
+        $course = $request->course;
+        $session = $request->session;
+
+
+        $file = $request->file('result');
+        
+        
+        $data = Excel::toArray([], $file);
+
+        
+        // Store the data in the database
+        // For example:
+        $n = 0;
+        
+
+        $results = [];
+
+        $foundRow = false;
+        $retrieveColumns = [];
+        
+        foreach ($data[0] as $rowNumber => $row) {
+
+
+            foreach($row as $col) {
+                if (array_key_exists($col, $matcher)) {
+                    foreach($row as $n => $column) {
+                        if (!array_key_exists($column, $matcher)) {
+                            continue;
+                        }
+                        $retrieveColumns[$n] = $matcher[$column];
+                    }
+                    $foundRow = $rowNumber;
+                    break;
+                }
+            }
+        
+        }
+
+        if ($foundRow === false) {
+            return redirect()->back()->with('error', 'Failed to scan results');
+        }
+        
+        
+        $results = array_splice($data[0], $foundRow + 2);
+
+        
+        $newResult = [];
+
+        
+        foreach($results as $result) {
+            $ResultDB = new Result();
+            foreach($retrieveColumns as $index => $retrieved) {
+                $newResult[$retrieved] = $result[$index];
+                $ResultDB->{$retrieved} = $result[$index];
+                $ResultDB->level = $level;
+                $ResultDB->semester = $semester;
+                $ResultDB->course_id = $course;
+                $ResultDB->session = $session; 
+            }
+            // Store into the database table Results 
+            $ResultDB->save();
+        }
+
+
+            
+        return redirect()->back()->with('success', count($results).' results uploaded and processed successfully');
     }
-    dd($results);
-    return redirect()->back()->with('success', 'Excel file uploaded and processed successfully');
-}
 
     public function import(Request $request) 
     {
@@ -64,5 +106,36 @@ public function uploadExcel(Request $request)
         Excel::import(new ResultsImport, $request->file('file'));
 
         return redirect()->back()->with('success','Results imported successfully.');
+    }
+
+    public function save_results(Request $request) {
+        $request->validate([
+            'results' => 'required',
+            'course_id' => 'required',
+        ]);
+        try {
+
+            $results = $request->results;
+            $course_id = $request->course_id;
+            $extracts = ['exam', 'score', 'lab', 'reg_no'];
+
+            foreach($results as $n => $result) {
+                $queue = new Result();
+                foreach($extracts as $extract) {
+                    $queue->$extract = $result[$extract];
+                }
+                $queue->course_id = $course_id;
+                $queue->uploaded_by = auth()->id();
+                $queue->save();
+            }
+            
+            return response([
+                'message' => 'Results uploaded successfully'
+            ]); 
+        } catch(\Exception $e) {
+            return response([
+                'message' => $e->getMessage().'Failed to upload results'
+            ], 401);
+        }
     }
 }

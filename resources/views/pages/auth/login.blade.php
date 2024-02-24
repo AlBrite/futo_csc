@@ -61,7 +61,6 @@
     
     <img src="http://127.0.0.1:8000/svg/frame.svg" alt="frame" class="absolute bottom-0 w-[350px] opacity-50 right-0">
   </body>
-  <script type="module" src="{{asset('scripts/base.js')}}"></script>
   <script>
     (function($) {
       $("form[action='/dologin']").on('submit', function(e) {

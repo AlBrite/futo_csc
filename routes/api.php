@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Student;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\ResultsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,9 +60,9 @@ Route::get('/findStudent', function(Request $request) {
 });
 
 
-Route::get('/courses', [CourseController::class, 'api_getCourses']);
-Route::get('/course', [CourseController::class, 'getCourseById']);
-Route::get('/course/create', [CourseController::class, 'api_createCourse']);
+Route::post('/courses', [CourseController::class, 'api_getCourses']);
+Route::post('/course', [CourseController::class, 'getCourseById']);
+Route::post('/course/create', [CourseController::class, 'api_createCourse']);
 
 
 Route::get('/student_course_details_home', [CourseController::class, 'student_course_details_home'])->middleware('auth');
@@ -80,12 +81,16 @@ Route::get('/search/students', [StudentController::class, 'search_students']);
 
 Route::group(['middleware' => ['auth:sanctum']], function() {
     Route::post('/class', [ClassController::class, 'api_fetchClass']);
+
+    Route::post('/save-results', [ResultsController::class, 'save_results']);
+
 });
 // Class Controllers
 Route::get('/classes', [ClassController::class, 'api_index']);
 
 
 Route::get('/enrolledCourses', [CourseController::class, 'api_getEnrolledCourses']);
+
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

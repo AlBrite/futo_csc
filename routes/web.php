@@ -420,6 +420,8 @@ Route::middleware('auth')->group(function(){
 
     Route::get('/advisor/{page}', fn($page) => view('pages.advisor.'.$page))->middleware('role:advisor');
 
+    Route::get('/calender', fn() => view('components.calendar'));
+
 
     Route::post('/updateprofile', [UserController::class, 'updateProfile']);
 
@@ -455,6 +457,8 @@ Route::middleware('auth')->group(function(){
 
     Route::get('/courses/add', [CourseController::class, 'addCourseForm'])
     ->name('add.course')->middleware('role:admin');
+
+    Route::get('/moderator/add-results', fn() => view('results.add-results'))->middleware('role:admin');
 
         
     Route::get('/admin/course/{course}', [CourseController::class, 'showForAdmin'])

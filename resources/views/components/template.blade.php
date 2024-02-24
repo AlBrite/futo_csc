@@ -1,4 +1,4 @@
-@props(['title', 'nav', 'data'])
+@props(['title', 'nav', 'data', 'module'])
 @php 
 
   use Illuminate\Support\Arr;
@@ -13,6 +13,11 @@
   if (strlen($data) > 0) {
     $data .= ',';
   }
+
+  if (!isset($module)) {
+    $module = $nav;
+  }
+  
   
 
     
@@ -23,12 +28,12 @@
   } 
 @endphp 
 <!DOCTYPE html>
-<html lang="en" x-bind:class="{'dark': darkMode}" x-data="{ {{$data}} showFullSideBar: false, darkMode: localStorage.getItem('darkMode')==='true', toggleTheme() { this.darkMode = !this.darkMode;localStorage.setItem('darkMode', this.darkMode);} }"  @resize.window="handleResize" class="{{$htmlClass}}">
+<html ng-cloak ng-app="myapp" lang="en" x-bind:class="{'dark': darkMode}" x-data="{ {{$data}} showFullSideBar: false, darkMode: localStorage.getItem('darkMode')==='true', toggleTheme() { this.darkMode = !this.darkMode;localStorage.setItem('darkMode', this.darkMode);} }"  @resize.window="handleResize" class="{{$htmlClass}}">
 <head>
   @include('layouts.head', ['title'=>$title])
   
 </head>
-<body class="page-{{$role}} h-screen">
+<body class="page-{{$role}} h-screen select-none">
 <div id="overlay"  class="dark:bg-black hidden" :xclass="{'flex':courseOpen||open|overlay}">
     <img src="{{asset('svg/logo.svg')}}" alt="">
     <div class="spinner"> </div>

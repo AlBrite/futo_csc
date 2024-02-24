@@ -252,6 +252,18 @@ class Enrollment extends Model
                     ->where('session', $session)->first();
     }
 
+    public static function students($semester, $session, $course_id) {
+        return self::join('students', 'enrollments.reg_no', 'students.reg_no')
+            ->join('courses', 'enrollments.course_id', 'courses.id')
+            ->join('users', 'students.id', 'users.id')
+            ->where('enrollments.semester', $semester)
+            ->where('enrollments.session', $session)
+            ->where('enrollments.course_id', $course_id)
+            ->select('users.name', 'students.reg_no','courses.code')
+            ->get()
+            ->unique('reg_no');
+    }
+
     
 
 

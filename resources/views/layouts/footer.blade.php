@@ -2,8 +2,11 @@
 
 
   $role = 'guest';
-  if(!isset($nav)) {
-    $nav = 'page';
+  if(!isset($module)) {
+    $module = 'page';
+  }
+  if (!isset($nav)) {
+    $nav = 'all';
   }
   
   if (auth()->check()) {
@@ -12,25 +15,35 @@
 
   $scripts = [
     "js/modules/$role.js",
+    "js/modules/$module.js",
+    "js/modules/$role-$module.js",
     "js/modules/$nav.js",
-    "js/modules/$role-$nav.js"
+    "js/modules/$nav-$module.js",
+    'js/upload.js',
+    'js/jselect.js',
+    "js/modules/$nav-$module.js",
+    
+    "js/modules/$nav-$module.js"
   ];
+  $scripts = array_unique($scripts);
 
 ?>
 <span id="footer-slot">
-  <script src="{{asset('js/jquery/jquery.min.js')}}"></script>
+  <script src="{{asset('js/jquery-3.6.0.min.js')}}"></script>
   <script defer type="module" src="{{asset('scripts/init-alpine.js')}}"></script>
   <script type="module" src="{{asset('scripts/main.js')}}"></script>
+  @auth
 
-@auth
+      <script type="module" src="{{asset('scripts/'.auth()->user()->role.'.js')}}"></script>
+      
+  @endauth
 
-    <script type="module" src="{{asset('scripts/'.auth()->user()->role.'.js')}}"></script>
-    
-@endauth
-
-@foreach($scripts as $script) 
-  @if(file_exists(public_path($script)))
-    <script defer type="module" src="{{ asset($script) }}"></script>
-  @endif
-@endforeach
-</script>
+  @foreach($scripts as $script) 
+    @if(file_exists(public_path($script)))
+      <script type="module" src="{{ asset($script) }}"></script>
+    @endif
+  @endforeach
+  
+  <script src="{{asset('js/angular.js')}}"></script>
+  <script type="module" src="{{ asset('js/ng-controllers.js') }}"></script>
+</span>

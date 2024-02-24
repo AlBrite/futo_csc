@@ -94,10 +94,6 @@ async function api(page, data, init) {
     
     fetch(url, init)
     .then(response => {
-      for(const header in response.headers.entries()) {
-        console.log(init);
-      }
-
 
       if (!response.ok) {
         throw new Error('Network response was not ok');

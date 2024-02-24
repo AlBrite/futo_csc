@@ -32,7 +32,7 @@
            ;
 
 
-dd($records->toSql());
+//dd($records->get());
 @endphp
    
     

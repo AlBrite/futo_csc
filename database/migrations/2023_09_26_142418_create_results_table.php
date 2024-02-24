@@ -14,7 +14,8 @@ return new class extends Migration
 
         Schema::create('results', function (Blueprint $table) {
             $table->id();
-            $table->integer('score');
+            $table->unsignedMediumInteger('score');
+            $table->unsignedBigInteger('uploaded_by');
             $table->unsignedBigInteger('course_id');
             $table->string('reg_no', 11);
             $table->unsignedTinyInteger('grading_id')->default(1);
@@ -25,6 +26,7 @@ return new class extends Migration
             $table->string('session', 9);
             $table->enum('semester', ['rain', 'harmattan']);
             $table->foreign('course_id')->references('id')->on('courses');
+            $table->foreign('uploaded_by')->references('id')->on('users');
             $table->timestamps();
         });
     }

@@ -65,7 +65,7 @@
 
                 <div class="">
                     <label for="course">Course</label>
-                    <select x-on:change="course=$event.target.value"  :disabled="!semester" name="course" id="course" class="input" disabled>
+                    <select x-on:change="course=$el.value"  :disabled="!semester" name="course" id="course" class="input" disabled>
                         <option value="">Select course</option>
                         <option value="all">All courses</option>
                         <option value="1">MTH 101</option>
