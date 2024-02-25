@@ -94,9 +94,19 @@ async function api(page, data, init) {
     
     fetch(url, init)
     .then(response => {
+      // return new Promise(async (resolve, reject) => {
+      //   const text = await response.text();
+      //   if (!response.ok) {
+      //     return reject(text)
+      //   }
+      //   const data = await response.json();
+      //   return resolve(data);
+
+
+      // });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error(response.text());
       }
      
       return response.json();

@@ -1,4 +1,4 @@
-<div x-cloak x-show="active_course" >
+<div ng-cloak ng-show="active_course" >
   
     <div class="flex-1">
 
@@ -9,13 +9,13 @@
 
             <div class="col-span-2 flex flex-col justify-center">
                 <p
-                    class="text-lg font-semibold text-body-800 select-none whitespace-nowrap text-ellipsis overflow-hidden" x-text="active_course.name">
+                    class="text-lg font-semibold text-body-800 select-none whitespace-nowrap text-ellipsis overflow-hidden" ng-bind="active_course.name">
                 </p>
                 <p class="flex items-center select-none">
-                    <span class="text-sm text-body-400 pr-2 border-r border-r-slate-[var(--body-300)]" x-text="active_course.code">
+                    <span class="text-sm text-body-400 pr-2 border-r border-r-slate-[var(--body-300)]" ng-bind="active_course.code">
                     </span>
                     <span class="text-sm text-body-300 pl-2 border-l border-l-slate-[var(--body-300)]">
-                        <span  x-text="active_course.units"></span> units
+                        <span  ng-bind="active_course.units"></span> units
                     </span>
                 </p>
             </div>
@@ -26,7 +26,7 @@
                 Marks distribution
             </p>
             <!-- If the course has practical -->
-            <div x-cloak x-show="active_course.practical > 0" class="flex flex-col gap-3">
+            <div ng-cloak ng-show="active_course.practical > 0" class="flex flex-col gap-3">
                 <div class="grid grid-cols-5">
                     <span class="col-span-1 p-3 flex center font-bold bg-accent-200">
                         20%
@@ -56,7 +56,7 @@
             <!-- If the course has practical -->
 
             <!-- If the course does not have practical -->
-            <div  x-cloak x-show="active_course.practical == 0" class="flex-col gap-3">
+            <div  ng-cloak ng-show="active_course.practical == 0" class="flex-col gap-3">
                 <div class="grid grid-cols-10">
                     <span class="col-span-3 p-3 flex center font-bold bg-accent-200">30%</span>
                     <span
@@ -78,17 +78,17 @@
 
         <div style="height: calc(100dvh-22.5rem);" class="p-2 flex flex-col gap-2 shrink-0">
             <p class="text-sm font-semibold text-body-300">Course Description</p>
-            <div class=" rounded overflow-y-auto p-1 text-sm text-body-500" x-text="active_course.outline">
+            <div class=" rounded overflow-y-auto p-1 text-sm text-body-500" ng-bind="active_course.outline">
               
             </div>
         </div>
 
     </div>
     <div>
-      <button class="btn-primary" x-on:click="updateCourse">Edit Course Details</button>
+      <button class="btn-primary" ng-click="updateCourse()">Edit Course Details</button>
     </div>
 </div>
 
-<div class="grid place-items-center">
+<div ng-show="!active_course" class="grid place-items-center">
     <img class="justify-self-center" src="{{asset('images/no-course.png')}}"/>
 </div>

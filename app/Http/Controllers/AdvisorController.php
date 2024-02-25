@@ -13,18 +13,19 @@ class AdvisorController extends Controller
 
     public function getAdvisor(Request $request) {
         $advisor_id = $request->advisor_id;
+        
 
         if (!$advisor_id) {
             return response()->json(['error' => 'Student Id is required'])->status(403);
         }
 
         $advisor = Advisor::where('id', '=', $advisor_id)->get();
-
+        
         if (!$advisor) {
             return response()->json(['error' => 'Advisor not found'])->status(404);
         }
         $advisor = $advisor->first();
-        $class = $advisor->academicSet;
+        $class = $advisor->class;
         $advisor->studentsCount = $class->students()->count();
         $students = $class->students()->with('user')->paginate(3);
 
@@ -46,7 +47,7 @@ class AdvisorController extends Controller
         $var = [
             'number_of_students_in_class' => 500,
         ];
-        $sets = Advisor::find(auth()->id())->first()->academicSet()->latest()->simplePaginate(6);
+        $sets = Advisor::find(auth()->id())->first()->class()->latest()->simplePaginate(6);
         dd($sets);
 
         return view('advisor.home', $var);

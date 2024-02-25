@@ -1,95 +1,146 @@
-import { Location, extend } from "../extend.js";
+import { app } from "../myApp.js";
+import { Location } from "../extend.js";
 
-async function retrieveCourse(e) {
-  try {
-    this.courseOpen = true;
-    if (this.courseId) {
-      const course = await fetch('/api/student_course_details_home', {
-        method:'POST',
-        body: JSON.stringify({course_id: this.courseId}),
-        headers: {
-          'Content-Type': 'application/json',
-          'cache-control': 'no-cache',
-        }
-      });
-      const data = await course.text();
+app.controller('CourseController', function($scope){
+  $scope.level = null;
+  $scope.semester = null;
+  $scope.active_id = null;
+  $scope.active_course = null;
+  $scope.course = null;
+  $scope.showCourseForm = null;
 
-      console.log(data);
+
+  $scope.getCourses = () => {
+    if ($scope.level && $scope.semester) {
+      api('/courses', {
+        level: $scope.level,
+        semester: $scope.semester
+      })
+      .then(res=>{
+        setTimeout(() => {
+
+          $scope.active_id=null;
+          $scope.active_course=null;
+          $scope.courses = res;
+
+        }, 500);
+      })
+      .catch(error=>console.log(error));
     }
-
-  } catch(e){
-    console.log(e);
+    $scope.course = $c
   }
-}
-window.retrieveCourse = retrieveCourse;
 
-function loadCourse($el) {
-  try {
-    let element = $el.target.parentNode;
 
-    while(!element.getAttribute('data_id')) {
-      element = element.parentNode;
+  $scope.loadCourse = (event) => {
+    let element = $(event.target);
+    if (!element.is('.eachcourse')) {
+      element = element.closest('.eachcourse[data-id]');
     }
+    const course_id = element.data('id');
 
-    const course_id = element.getAttribute('data_id');
-    let queryParams = {course_id};
-    if (this.semester) {
-      queryParams.semester = this.semester;
-    }
-    if (this.level) {
-      queryParams.level = this.level;
-    }
-    
-  
-    this.active_id = course_id;
-    appendAndChangeLocation(queryParams)
-    api('/course', {
-      course_id
-    })
-    .then(response=> {
-      this.active_course = response;
-    })
-    .catch(error => console.error(error));
-  } catch(e){
-    console.log(e);
-  }
-}
-window.loadCourse = loadCourse;
 
-function updateCourse() {
-  if (this.active_id) {
+    alert(course_id);
+    return;
     try {
+     
+      let queryParams = {course_id};
+      if ($scope.semester) {
+        queryParams.semester = $scope.semester;
+      }
+      if ($scope.level) {
+        queryParams.level = $scope.level;
+      }
+      
+    
+      $scope.active_id = course_id;
+      appendAndChangeLocation(queryParams)
       api('/course', {
-        course_id: this.active_id
+        course_id
       })
       .then(response=> {
-        this.editData = response;
+        $scope.active_course = response;
       })
       .catch(error => console.error(error));
-    } catch(e){}
+    } catch(e){
+      console.log(e);
+    }
   }
-}
-window.updateCourse = updateCourse;
 
+  $scope.init = () => {
+    $scope.courses = [];
 
-function getCourses() {
-  if (this.level && this.semester) {
-    api('/courses', {
-      level: this.level,
-      semester: this.semester
-    })
-    .then(res=>{
-      this.active_id=null;
-      this.active_course=null;
-      this.courses=res
-    })
-    .catch(error=>console.log(error));
+    if ($scope.level && $scope.semester) {
+       api('/courses', {
+         level: $scope.level,
+         semester: $scope.semester
+       })
+       .then(res=>$scope.courses=res)
+       .catch(error=>console.log(error));
+     }
+     if ($scope.active_id) {
+       appendAndChangeLocation({course_id:$scope.active_id})
+       api('/course', {
+         course_id: $scope.active_id
+       })
+       .then(response=> {
+         console.log(response);
+         //$scope.editData = response;
+         $scope.active_course = response;
+       })
+       .catch(error => console.error(error));
+     }
   }
-}
-window.getCourses = getCourses;
+});
 
-alert(1);
+app.controller("AdminCoursesController", function($scope){
+  $scope.courseOpen = false;
+  $scope.courseId = null;
+  $scope.showCourseForm = false;
+  $scope.editData = null;
+  $scope.active_course = null;
+  $scope.level = 500;
+  $scope.courses=null;
+  $scope.editStudent=false;
+  console.log(this,$scope);
 
+  $scope.selectedLevel = function() {
+    return true;
+  }
+
+  
+  // $scope.retrieveCourse = async () => {
+  //   try {
+  //     $scope.courseOpen = true;
+  //     if ($scope.courseId) {
+  //       const course = await api('/student_course_details_home', {
+  //         course_id: this.courseId
+  //       });
+  //     }
+
+  //   } catch(e){
+  //     console.log(e);
+  //   }
+  // }
+
+  
+
+  // $scope.updateCourse = () => {
+  //   if ($scope.active_id) {
+  //     try {
+  //       api('/course', {
+  //         course_id: $scope.active_id
+  //       })
+  //       .then(response=> {
+  //         $scope.editData = response;
+  //       })
+  //       .catch(error => console.error(error));
+  //     } catch(e){}
+  //   }
+  // }
+
+  
+
+});
 
 document.querySelectorAll('.displayCourse[course_id]').forEach(element => {
   element.addEventListener('click', () => {

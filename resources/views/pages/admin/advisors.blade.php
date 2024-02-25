@@ -10,9 +10,9 @@
   }
 
 @endphp
-<x-template nav="advisors" title="Admin - Advisors Manager" data="addAdvisor: null, advisor_id:{{$advisor_id}}, advisor: null, open:false, level: null, editAdvisor: null, firstname: '', middlename: '', lastname: ''">
-  <div x-init="init" class="md:flex justify-between items-stretch max-h-full min-h-full overflow-hidden">
-    <div x-bind:class="{'hidden md:block': advisor}" class="md:w-[380px]">
+<x-template nav="advisors" title="Admin - Advisors Manager">
+  <div data-init="advisor_id={{$advisor_id}}" ng-controller="AdvisorController" class="md:flex justify-between items-stretch max-h-full min-h-full overflow-hidden">
+    <div ng-class="{'hidden md:block': advisor}" class="md:w-[380px]">
       <div>
         <form class="flex items-center justify-between gap-2 w-full flex-wrap bg-green-50 p-5">
           
@@ -27,7 +27,7 @@
             <table class="border-collapse">
               <tbody>
                 @foreach($advisors as $advisor)
-                  <tr advisor_id="{{$advisor->id}}" x-on:click="displayAdvisor" class="hover:bg-green-100 cursor-pointer gap-3 border-b border-slate-200 last:border-transparent p-5 items-center">
+                  <tr advisor_id="{{$advisor->id}}" ng-click="displayAdvisor({{$advisor->id}})" class="hover:bg-green-100 cursor-pointer gap-3 border-b border-slate-200 last:border-transparent p-5 items-center">
                     <td align="center">
                       <img src="{{$advisor->picture()}}" alt="PIC" class="w-10 h-10 rounded-full object-cover"/>
                     </td>
@@ -63,7 +63,7 @@
         </div>
 
         <div>
-          <button class="btn-white top-0 sticky" x-on:click="addAdvisor=true">Add Advisor</button>
+          <button class="btn-white top-0 sticky" ng-click="addAdvisor=true">Add Advisor</button>
         </div>
 
         

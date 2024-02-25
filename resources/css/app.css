@@ -201,7 +201,7 @@ input.btn-lg, button.btn-lg, select.btn-lg {
 }
 
 :disabled {
-  opacity: 0.5 !important;
+  opacity: 0.4 !important;
   cursor: not-allowed;
   pointer-events: none;
 }
