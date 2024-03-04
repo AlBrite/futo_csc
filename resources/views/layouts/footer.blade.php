@@ -31,12 +31,13 @@
 <span id="footer-slot">
   
   <script src="{{asset('js/jquery-3.6.0.min.js')}}"></script>
-  <script type="module" src="{{ asset('js/ng-controllers.js') }}"></script>
-  <script src="{{asset('js/angular/angular.min.js')}}"></script>
 
 
   <!-- <script defer type="module" src="{{asset('scripts/init-alpine.js')}}"></script> -->
   <script type="module" src="{{asset('scripts/main.js')}}"></script>
+  
+  <script src="{{asset('js/angular/angular.min.js')}}"></script>
+  <script type="module" src="{{ asset('js/ng-controllers.js') }}"></script>
   
 
   @auth
@@ -50,5 +51,10 @@
       <script type="module" src="{{ asset($script) }}"></script>
     @endif
   @endforeach
+  <script>
+    $(function(){
+  offOverlay();
+});
+</script>
   
 </span>

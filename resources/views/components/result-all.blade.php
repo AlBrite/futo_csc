@@ -1,6 +1,7 @@
 @php 
     $advisor = \App\Models\Advisor::active();
-    $class = $advisor->academicSet;
+    dd($advisor);
+    $class = $advisor->class;
     $students = $class->students;
     //$results = $class->results;
     $session = request()->get('session');
@@ -68,7 +69,7 @@
    
     
 
-    $results = $class->students()
+    $results = $class?->students()
         ->join('results', 'results.reg_no', '=', 'students.reg_no')
         ->join('courses', 'courses.id', '=', 'results.course_id')
         ->join('enrollments', 'enrollments.course_id', '=', 'results.course_id')

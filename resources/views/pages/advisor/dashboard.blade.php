@@ -1,6 +1,8 @@
 @php 
 $advisor = \App\Models\Advisor::active();
-$class = $advisor->class->first();
+$authUser = auth()->user();
+$classes = $authUser->profile->classes()->with('students')->get();
+$class = $classes->first();
 $students = $class->students();
 $number_of_students_in_class = $students->count();
 $allStudents = $students->cursorPaginate(5);
@@ -15,7 +17,7 @@ $results = $results->cursorPaginate(15);
 
 
 @endphp
-<x-user-layout nav="home" title="Advisor Dashboard">
+<x-template nav="home" title="Advisor Dashboard">
 
 
     <div class="scroller">
@@ -128,4 +130,4 @@ $results = $results->cursorPaginate(15);
         </div>
     </div>
 
-</x-user-layout>
+</x-template>

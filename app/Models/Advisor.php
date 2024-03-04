@@ -85,4 +85,11 @@ class Advisor extends Model
     public function class() {
         return $this->hasOne(AcademicSet::class);
     }
+
+
+    public static function _create($data) {
+        $obj = new Advisor();
+        $data = Arr::only($data, $obj->fillable);
+        return self::create($data);
+    }
 }

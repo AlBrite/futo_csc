@@ -26,4 +26,12 @@ class AnnouncementController extends Controller
 
         return redirect()->back()->with('success', 'Announcement has been made successfully.');
     }
+
+    /**
+     * Display form to insert announcement
+     */
+
+    public function insert() {
+        return view('pages.announcement');
+    }
 }

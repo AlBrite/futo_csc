@@ -6,7 +6,7 @@
     
     
 @endphp
-<x-user-layout title="My Profile" nav="profile">
+<x-template title="My Profile" nav="profile">
     <div class="scroller">
         <div id="profile-container" class="flex flex-col gap-4 items-center p-4 xl:grid xl:grid-cols-4">
             <div
@@ -132,4 +132,4 @@
         </div>
     </div>
             
-</x-user-layout>
+</x-template>

@@ -57,11 +57,17 @@ class Course extends Model
         return $this->hasOne(Result::class, 'course_id', 'id');
     }
 
+    
+
 
 
     public static function getAllCourses()
     {
-        return Course::get();
+        return Course::where('status', 'active')->get();
+    }
+
+    public static function achiveCourse(int $course_id) {
+        $course = Course::find($course_id)->get();
     }
 
     public function prerequisites() {
@@ -76,6 +82,24 @@ class Course extends Model
     {
         return Course::where('level', $level)->where('semester', $semester)->with('enrollments')->orderBy('mandatory', 'desc')->get();
     }
+
+    public static function listCoursesForRegistrations($level, $semester, ?array $borrowed) {
+      ;
+        $borrowed ??= [];
+        $borrowed = array_filter($borrowed, fn($item) => is_numeric($item));
+
+        return Course::where('level', $level)
+        ->where('semester', $semester)
+        ->orWhereIn('id', $borrowed)
+        ->with('enrollments')
+        ->orderBy('mandatory', 'desc')->get();
+
+
+        Course::getCoursesForRegistration(request()->level, request()->semester, request()->courses);
+    }
+
+
+
 
 
 

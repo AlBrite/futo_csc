@@ -6,9 +6,9 @@ $class_id = request()->get('class');
 
 @endphp
 
-<x-template title="Admin - Results" nav="results" data="courses:null, class: null, sessions: [], selected: {}">
+<x-template title="Admin - Results" nav="results">
     
-    <div class="p-4">
+    <div class="p-6 pb-0" ng-controller="ResultsController">
         <style>
             @media screen and (max-width: 367.5px ) {
                 #search-label {
@@ -25,13 +25,15 @@ $class_id = request()->get('class');
             <a href="/moderator/add-result">Manually Add Results</a>
         </div>
 
-        <div class="w-full mt-4" x-data="{semester:'{{$semester}}', course: false, session: '{{$session}}'}">
-            <form method="get" class="flex items-center gap-x-2 w-full relative flex-wrap mb-4">
-                @csrf
+        <div class="w-full mt-4">
+            <form action="/" method="get" class="flex items-center gap-x-2 w-full relative mb-4">
+                
                 <label for="student-search" class="text-body-200 absolute top-3 left-1" id="search-label">
                     <span class="material-symbols-rounded">search</span>
                 </label>
-                <input type="search" name="studentSearch" id="student-search" placeholder="Enter Name or Reg Number" class="input">
+                <div>
+                    <input type="search" name="studentSearch" id="student-search" placeholder="Enter Name or Reg Number" class="input">
+                </div>
                 
                 <button type="submit"
                     class="btn-sm btn-primary">
@@ -39,12 +41,12 @@ $class_id = request()->get('class');
                 </button>
             </form>
 
-            <form method="get" class="flex items-end flex-wrap gap-x-2" id="result-options-form">
+            <form action="?" method="get" class="flex items-end flex-wrap gap-x-2" id="result-options-form">
 
-                <div class="">
+                <div class="flex-1">
                     <label for="class">Class</label>
                     
-                    <select x-on:change="setClass" name="class" id="class" class="w-full input">
+                    <select ng-change="setClass()" ng-model="class_id" name="class" id="class" class="w-full input">
                         <option value="" class>Select Class</option>
                         @if(auth()->user()->role == 'admin')
                             @foreach(\App\Models\Admin::academicSets() as $class)
@@ -58,52 +60,50 @@ $class_id = request()->get('class');
                     </select>
                 </div>
             
-                <div class="">
+                <div class="flex-1">
                     <label for="session">Session</label>
                     
-                    <select x-on:change="session=$event.target.value" :disabled="sessions.length<1" name="session" id="session" class="w-full input" disabled>
+                    <select ng-disabled="sessions.length<1" ng-model="session" name="session" id="session" class="w-full input">
                         <option value="" class>Select session</option>
-                        <template x-for="session in sessions" :key="session">
-                            <option value="" :selected="'{{$session}}'==session" :value="session" x-text="session"></option>
-                        </template>
+                        <option ng-repeat="sess in sessions" value="{% sess %}">{% sess %}</option>
                     </select>
                 </div>
 
-                <div class="">
+                <div class="flex-1">
                     <label for="semester">Semester</label>
-                    <select :disabled="!session" name="semester" id="semester" class="input" x-on:change="selectSemesterAndSuggestCourses" disabled>
+                    <select ng-disabled="!session" ng-model="semester" name="semester" id="semester" class="input" ng-change="selectSemesterAndSuggestCourses()">
                         <option value="">Select semester</option>
-                        <option value="harmattan" :selected="'harmattan'==semester">Harmattan</option>
-                        <option value="rain" :selected="'rain'==semester">Rain</option>
+                        <option value="harmattan">Harmattan</option>
+                        <option value="rain">Rain</option>
                     </select>
                 </div>
 
                 <div class="">
                     <label for="course">Course</label>
-                    <select x-on:change="course=$event.target.value"  :disabled="!semester" name="course" id="course" class="input" disabled>
+                    <select ng-disabled="!semester" ng-model="course" name="course" id="course" class="input">
                         <option value="">Select course</option>
                         <option value="all">All courses</option>
-                        <template x-for="course in courses" :key="course.id">
-                            <option :value="course.id" x-text="course.course.code"></option>
-                        </template>
+                        <option ng-repeat="course in courses track by course.course.id" value="{% course.course.id %}">{% course.course.code %}</option>
+
                     </select>
                 </div>
 
-                <button :disabled="!course" type="submit" disabled class="btn-sm btn-primary !m-0">
+                <button ng-disabled="!course" type="submit" class="btn-sm btn-primary !m-0">
                     View Result
                 </button>
             </form>
         </div>
-    </div>
-
-    @if($course)
-    @if($course === 'all')
-        @include('results.all-results', ['class' => $class])
-    @else 
-        @include('results.course-results')
-    @endif
-    @endif
     
+
+        @if($course)
+        @if($course === 'all')
+            @include('results.all-results', ['class' => $class])
+        @else 
+            @include('results.course-results')
+        @endif
+        @endif
+    
+    </div>
 
     
 </x-template>

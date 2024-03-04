@@ -9,8 +9,7 @@ use App\Models\{
     Student,
     Admin
 };
-
-
+use Exception;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -18,7 +17,8 @@ use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Arr;
-
+use Illuminate\Support\Facades\Hash;
+use stdClass;
 
 class User extends Authenticatable
 {
@@ -44,10 +44,11 @@ class User extends Authenticatable
 
     private $namesLoaded = false;
 
-    public static $accounts = [
-        'advisor' => Advisor::class,
-        'student' => Student::class,
-        'admin'  => Admin::class,
+    protected static $accounts = [
+        'advisor'  => Advisor::class,
+        'student'  => Student::class,
+        'admin'    => Admin::class,
+        'lecturer' => Lecturer::class,
     ];
 
     /**
@@ -73,6 +74,60 @@ class User extends Authenticatable
 
 
 
+    /**
+     * Get the phone number for SMS notifications.
+     *
+     * @return string
+     */
+    public function routeNotificationForNexmo()
+    {
+        return $this->phone;
+    }
+
+
+
+    /**
+     * Get the email address for email notifications.
+     *
+     * @return string
+     */
+    public function routeNotificationForMail()
+    {
+        return $this->email;
+    }
+
+
+
+    public function devices()
+    {
+        return $this->hasMany(Device::class);
+    }
+
+    public function getHashedPassword() {
+        if (request()->has('password')) {
+            $request = request();
+            $password = $request->get('password');
+            $old_password = $request->get('old_password');
+
+            // check if the user is the owner, if not unset password field
+            // because only the owner can change it
+            $auth_id = auth()->id();
+            $user_id = $this->id;
+
+            if ($auth_id != $user_id) {
+                return null;
+            }
+            else if (!$request->has('old_password')) {
+                throw new Exception('Current password is required');
+            }
+            if (!Hash::compare($password, $this->password)) {
+                throw new Exception('Passwords do not match');
+            }
+            return Hash::make($password);
+        }
+
+        return null;
+    }
 
     public static function getFullnameFromRequest()
     {
@@ -91,55 +146,22 @@ class User extends Authenticatable
         return implode(' ', $fullname);
     }
 
-    public static function getFillables(array $data = [])
-    {
-        $class = __CLASS__;
-        $obj = new $class;
+    public function getFullnameAttribute($value) {
+        $nameParts = explode(' ', $this->name);
 
-        $fillables = $obj->fillable;
-        if (count($data) === 0) {
-            return $fillables;
-        }
-        return Arr::only($data, $fillables);
+        $obj = new stdClass;
+
+        $obj->firstname = $nameParts[0];
+        $obj->lastname = count($nameParts) > 1 ? $nameParts[1] : '';
+        $obj->middlename = count($nameParts) > 2 ? $nameParts[2] : '';
+        return $obj;
     }
 
+   
 
 
 
 
-
-    public function generateUsername($firstName, $lastName)
-    {
-        $firstName = trim($firstName);
-        $lastName = trim($lastName);
-        $usernames = [
-            $firstName . $lastName,
-            substr($firstName, 0, 1) . $lastName,
-            $firstName . substr($lastName, 0, 3),
-            $firstName . '_' . $lastName,
-            substr($firstName, 0, 1) . '_' . $lastName,
-            $firstName . '_' . substr($lastName, 0, 1),
-            $lastName . $firstName,
-            substr($lastName, 0, 1) . $firstName,
-            $lastName . substr($firstName, 0, 3),
-            $lastName . '_' . $firstName,
-            substr($lastName, 0, 1) . '_' . $firstName,
-            $lastName . '_' . substr($firstName, 0, 1),
-            substr($firstName, 0, 3) . substr($lastName, 0, -3)
-        ];
-        shuffle($usernames);
-        $username = end($usernames);
-
-        $count = User::where('username', $username)->count();
-
-        if ($count > 0) {
-            $username .= $count;
-        }
-        if (User::where('username', $username)->exists()) {
-            return $this->generateUsername($firstName, $lastName);
-        }
-        return $username;
-    }
 
     public function generateId($role, $prefix = null)
     {
@@ -161,33 +183,33 @@ class User extends Authenticatable
     {
         
 
-        $accounts = [
-            'advisor' => \App\Models\Advisor::class,
-            'admin' => \App\Models\Admin::class,
-            'student' => \App\Models\Student::class,
-        ];
-        
+        // Default rolr
         $data['role'] ??= 'student';
-        if (!array_key_exists($data['role'], $accounts)) {
-            $data['role'] = 'student';
+ 
+        if (!array_key_exists($data['role'], self::$accounts)) {
+            return null;
         }
+
         $role = $data['role'];
-        
-        
-        $userData = User::getFillables($data);
+
+        $account = self::$accounts[$role];
         
         // Create user account for authentification
-        $authUser = User::create($userData);
+        $authUser = User::_create($data);
         
-        $account = $accounts[$role];
         
-        $fillables = $account::getFillables($data);
-        $fillables['id'] = $authUser->id;
+        $data['id'] = $authUser->id;
         
         // Add User to role table
-        $account::create($fillables);
+        $account::_create($data);
         
         return $authUser;
+    }
+
+    public static function _create($data) {
+        $obj = new User();
+        $data = Arr::only($data, $obj->fillable);
+        return User::create($data);
     }
 
 
@@ -254,30 +276,7 @@ class User extends Authenticatable
         return redirect()->route($dashboard);
     }
 
-    public static function findUser(string $username, string $column = 'username') {
-        $allowedColumns = [
-            'username',
-            'id',
-            'name',
-            'email'
-        ];
-
-        if (!in_array($column, $allowedColumns)) {
-            return null;
-        }
-        $user = User::where($column, $username)->first();
-        if (!$user) {
-            return null;
-        }
-        $account = User::$accounts[$user->role];
-        $profile = $account::where('id', $user->id)->first();
-
-        if ($profile) {
-            $user->attributes = array_merge($user->attributes, $profile->attributes);
-        }
-
-        return $user;
-    }
+   
 
 
     public function profile() {
@@ -286,21 +285,11 @@ class User extends Authenticatable
             'student' => $this->hasOne(Student::class, 'id'),
             'admin' => $this->hasOne(Admin::class, 'id'),
             'advisor' => $this->hasOne(Advisor::class, 'id', 'id'),
+            'lecturer' => $this->hasOne(Lecturer::class, 'id', 'id'),
             default => null,
         };
     }
-
-    public function getStaticClass() {
-        
-         return match ($this->role) {
-             'admin' => Admin::class,
-             'advisor' => Advisor::class,
-             'student' => Student::class,
-             default => null,
-         };
-
-    }
-
+    
 
 
     public function advisor()
@@ -311,6 +300,11 @@ class User extends Authenticatable
     public function student()
     {
         return $this->hasOne(Student::class, 'id', 'id');
+    }
+
+    public function lecturer()
+    {
+        return $this->hasOne(Lecturer::class, 'id', 'id');
     }
     
 
@@ -334,38 +328,9 @@ class User extends Authenticatable
     }
 
 
-    public function loadNames() {
-        if (!$this->namesLoaded) {
-            $split = preg_split('/\s+/',$this->name);
-            $names = ['_firstname', '_lastname','_middlename'];
-            foreach($names as $n => $name) {
-                if (isset($split[$n])) {
-                    $this->$name = $split[$n];
-                }
-            }
-            $this->namesLoaded = true;
-        }
-        return $this;
-    }
 
-
-    public function firstname() {
-        $this->loadNames();
-
-        return $this->_firstname;
-    }
-
-    public function lastname() {
-        $this->loadNames();
-
-        return $this->_lastname;
-    }
-
-    public function middlename() {
-        $this->loadNames();
-
-        return $this->_middlename;
-    }
+   
+    
 
 
     
@@ -374,9 +339,20 @@ class User extends Authenticatable
         return $this->hasMany(AcademicSet::class)->with('_course');
     }
 
+
+
+
+
+
+
+
     public function todos() {
         return $this->hasMany(Todo::class);
     }
+
+
+
+
 
 
     public function picture() {

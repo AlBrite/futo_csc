@@ -15,6 +15,11 @@ function getOffset(element)
     });   
 }
 
+function log(...attrs) {
+  console.log(...attrs);
+}
+window.log = log;
+
 function appendAndChangeLocation(params) {
   const currentUrl = new URL(window.location.href);
   let queryParams = currentUrl.searchParams;
@@ -93,17 +98,11 @@ async function api(page, data, init) {
     }
     
     fetch(url, init)
-    .then(response => {
-      // return new Promise(async (resolve, reject) => {
-      //   const text = await response.text();
-      //   if (!response.ok) {
-      //     return reject(text)
-      //   }
-      //   const data = await response.json();
-      //   return resolve(data);
-
-
-      // });
+    .then( response => {
+      
+      // const text = await response.text();
+      // console.log(text, data);
+      
 
       if (!response.ok) {
         throw new Error(response.text());

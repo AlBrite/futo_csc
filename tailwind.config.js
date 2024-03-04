@@ -1,17 +1,18 @@
 /** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./resources/**/*.blade.php",
-    "./resources/**/*.js",
-    "./resources/**/*.vue",
-  ],
-  theme: {
-    extend: {
-    },
-  },
-  plugins: [],
-  variants: {
-    backgroundCOlor: ['dark','dark-hover','dark-group-hover','dark-even', 'dark-odd'],
-  },
-  darkMode: 'class',
-}
+export const content = [
+  "./resources/**/*.blade.php",
+  "./resources/**/*.js",
+  "./resources/**/*.vue",
+  './resources/**/*.css',
+  './resources/**/*.svg',
+];
+export const theme = {
+  extend: {},
+};
+export const plugins = [
+  // require('tailwind-scrollbar'),
+];
+export const variants = {
+  backgroundCOlor: ['dark', 'dark-hover', 'dark-group-hover', 'dark-even', 'dark-odd'],
+};
+export const darkMode = 'class';

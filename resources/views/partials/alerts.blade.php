@@ -48,16 +48,9 @@
 @endphp
 
 @if ($message)
-    <div x-data="{ showAlert: true }" x-init="setTimeout(() => showAlert = false, 5000)" 
-         class="fixed top-[100px] left-0 right-0 flex justify-center z-[1001]">
-        <div x-show="showAlert" 
-             x-transition:enter="transition ease-out duration-1000" 
-             x-transition:enter-start="opacity-0 transform translate-y-1/2" 
-             x-transition:enter-end="opacity-100 transform translate-y-0" 
-             x-transition:leave="transition ease-in duration-1000" 
-             x-transition:leave-start="opacity-100 transform translate-y-0" 
-             x-transition:leave-end="opacity-0 transform translate-y-1/2" 
-             class="{{ $class }} p-4 rounded-md w-[200px]">
+
+    <div ng-controller="AlertController">
+        <div ng-show="showAlert" ng-class="{ 'fade-in': showAlert, 'fade-out': !showAlert }" class="{{ $class }} flash">
             {{ $message }}
         </div>
     </div>

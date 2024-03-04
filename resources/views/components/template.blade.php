@@ -26,17 +26,18 @@
   if (auth()->check()) {
     $role = auth()->user()->role;
   } 
+  
 @endphp 
 <!DOCTYPE html>
-<html lang="en" ng-cloak ng-app="cscPortal" ng-controller="root" ng-class="{'dark': darkMode}"  ng-resize="handleResize()" class="{{$htmlClass}}" custom-on-change>
+<html lang="en" ng-cloak ng-app="cscPortal" ng-controller="RootController" ng-class="{'dark': darkMode}"  ng-resize="handleResize()" class="{{$htmlClass}}" ng-init="small=window.innerWidth" custom-on-change>
   <head>
     @include('layouts.head', ['title'=>$title])
     
   </head>
-  <body class="page-{{$role}} h-screen select-none">
+  <body class="page-{{$role}} select-none">
       <div id="overlay"  class="dark:bg-black hidden">
-        <img src="{{asset('svg/logo.svg')}}" alt="">
-        <div class="spinner"> </div>
+        <img src="{{asset('svg/logo.svg')}}" alt="" class="animate-pulsing">
+        
         <noscript>
           <style>
             #overlay img, #overlay .spinner {display:none}
@@ -57,11 +58,11 @@
 
     <div class="lg:flex items-stretch h-screen relative">
 
-      @include('layouts.menu', compact('nav', 'role'))
+      @include('layouts.aside', compact('nav', 'role'))
 
-      <div class="lg:flex flex-1 flex-col">
+      <div class="lg:flex flex-1 flex-col h-full">
         @include('layouts.header')
-        <main class="lg:flex flex-1 flex-col" id="main-slot">
+        <main id="main-slot">
           
             {{$slot}}
 

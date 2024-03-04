@@ -259,7 +259,7 @@ class Enrollment extends Model
             ->where('enrollments.semester', $semester)
             ->where('enrollments.session', $session)
             ->where('enrollments.course_id', $course_id)
-            ->select('users.name', 'students.reg_no','courses.code')
+            ->select('users.name', 'students.reg_no','courses.code', 'courses.units', 'courses.name as course_name', 'enrollments.level')
             ->get()
             ->unique('reg_no');
     }

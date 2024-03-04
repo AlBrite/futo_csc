@@ -23,10 +23,13 @@ return new class extends Migration
             $table->smallInteger('lab');
             $table->smallInteger('exam');
             $table->smallInteger('test');
+            $table->enum('remark', ['FAILED', 'PASSED'])->nullable();
+            $table->enum('status', ['PENDING', 'APPROVED', 'COMPLETED'])->default('PENDING');
+            $table->char('grade', 1);
             $table->string('session', 9);
             $table->enum('semester', ['rain', 'harmattan']);
+            $table->boolean('approved')->default(false);
             $table->foreign('course_id')->references('id')->on('courses');
-            $table->foreign('uploaded_by')->references('id')->on('users');
             $table->timestamps();
         });
     }

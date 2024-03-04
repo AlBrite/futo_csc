@@ -43,6 +43,12 @@ class Admin extends Model
 
     public function user()
     {
-        $this->hasOnly(User::class);
+        $this->hasOne(User::class);
+    }
+
+    public static function _create($data) {
+        $obj = new Admin();
+        $data = Arr::only($data, $obj->fillable);
+        return self::create($data);
     }
 }

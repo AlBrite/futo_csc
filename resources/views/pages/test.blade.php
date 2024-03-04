@@ -1,40 +1,24 @@
-<head>
-  <script src="{{asset('js/angular.js')}}"></script>
-</head>
+<x-template>
+  <script>
+    function select(value) {
+      alert('I selected '+value);
+    }
+  </script>
 
-<body ng-cloak ng-app="myapp" w3-test-directive>
-  <div ng-controller="HelloController">
-    <p>Name : <input type="text" ng-model="name"></p>
-    <h1>Hello {% name %}</h1>
-    <p>Total in dollar: {% quantity * cost %}</p>
-    <h2>Welcome {% helloTo.title %} to the world of Tutorialspoint! {% 10 + 2 %}</h2>
-  </div>
+  <x-checkbox name="gender" value='Male'>Male</x-checkbox>
+  <x-radio name="gender" value='Female'>Female</x-radio>
+ <br>
+ <br>
+ <br>
+ <br>
 
+  
 
-  <div ng-controller="HelloController">
-    <p>Name : <input type="text" ng-model="name"></p>
-    <h1>Hello {% name %}</h1>
-    <p>Total in dollar: {% quantity * cost %}</p>
-    <h2>Welcome {% helloTo.title %} to the world of Tutorialspoint! {% 10 + 2 %}</h2>
-  </div>
-
- <style>
-  .classR {
-    color: red;
-  }
-  </style>
-  <div ng-controller="BrightController">
-    <h2 ng-show="visible()">Welcome {% helloTo.title %} to the world of Tutorialspoint! {% 10 + 2 %}</h2>
-    <button ng-disabled="disabled()" ng-class="{'classR': visibleColor}">click</button>
-  </div>
-
- 
-
-  <form method="POST">
-    <input type="submit" value="submit"/>
-  </form>
+  <div class="flex justify-start">
+    <x-dropdown name="courses[]" placeholder="Gender">
+    <x-option value="male">Male</x-option>
+    <x-option value="female">Female</x-option>
+  </x-dropdown></div>
 
 
-</body>
-
-</html>
+</x-template> 

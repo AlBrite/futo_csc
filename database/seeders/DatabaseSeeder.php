@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
         $courses = $getJson('courses');
         $results = $getJson('results');
         
-        $gradings = $getJson('gradingS');
+        $gradings = $getJson('gradings');
         $enrollments = $getJson('enrollments');
         ob_start();
         ob_clean();

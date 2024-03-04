@@ -44,11 +44,88 @@ class CourseController extends Controller
         'image',
         'outline'
     ];
+
+
+    public function admin_view_courses() {
+        return view('pages.admin.courses');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function add() {
+        return view('pages.course.add');
+    }
+    
+    public function edit(Request $request) {
+        $request->validate([
+            'course_id' => 'required'
+        ]);
+        $course = Course::find($request->course_id)?->get()?->first();
+        if (!$course) {
+            return redirect()->back()->with('error', 'Course not found');
+        }
+
+        return view('pages.course.edit', [
+            'course' => $course
+        ]);
+    }
+
+
+
     public function index()
     {
         $courses = Course::where('id', '>', 1)->paginate(15);
         return view('courses.index', compact('courses'));
     }
+
+    /**
+     * Save courses selected by students
+     */
+
+    public function index_student() {
+        return view('pages.student.courses');
+    }
+
+    /**
+     * Display form for course registration
+     */
+
+    public function course_form() {
+        return view('pages.student.course-registration-borrow-courses');
+    }
+
+    
 
     
 
@@ -60,12 +137,6 @@ class CourseController extends Controller
 
     
 
-    public function registerForm()
-    {
-        $department = Department::myDepartment()->first();
-        $levels = Department::levels();
-        return view('courses.register', compact('department', 'levels'));
-    }
 
     public function listRegisteredCourses()
     {
@@ -197,25 +268,10 @@ class CourseController extends Controller
         ]);
         
         
-            $image_path = null;
-            if ($request->hasFile('image') && $request->file('image')->isValid()) {
-                $uploadedImage = $request->file('image');
-                $filename = Str::random(10) . '.' . $uploadedImage->getClientOriginalExtension();
-                $image_path = "public/images/$filename";
-                $uploadedImage->storeAs('public/images', $filename);
-                
-            } else {
-                // The image data is in base64 format
-                $base64Image = $request->input('image');
-                $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $base64Image));
-                $filename = Str::random(10) . '.png'; // You can adjust the file extension according to your image format
-                $image_path = storage_path('app/public/images/' . $filename);
-                file_put_contents($image_path, $imageData);
-            }
-            if ($image_path) {
-                $formData['image'] = $image_path;
-            }
-
+        
+        if ($image_path = UploaderController::uploadFile('image')) {
+            $formData['image'] = $image_path;
+        }
 
 
         
@@ -224,17 +280,16 @@ class CourseController extends Controller
         $data['units'] = $request->practical + $request->exam + $request->test;
         $data['code'] = trim(strtoupper($data['code']));
         $data['name'] = ucfirst(trim($data['name']));
-        dd($data);
         $data['grouping_id'] = $request->level + ($request->semester === 'rain' ? 2 : 1);
         $course = Course::create($data);
 
 
         
         return $course;
-       
+        
     }
-
-
+    
+    
     public function updateCourse(Request $request)
     {
         
@@ -250,7 +305,7 @@ class CourseController extends Controller
             'prerequisites' => 'sometimes',
             'check' => 'required',
             'mandatory' => 'required|in:1,0',
-            'outline' => 'required'
+            'outline' => 'sometimes'
         ], [
             'name.required' => 'Course Title is required',
             'code.required' => 'Couse Code is required',
@@ -262,7 +317,6 @@ class CourseController extends Controller
             'mandatory.in' => 'Select option',
             'image' => 'sometimes|image|max:2048', // Ensure 'image' is present and is an image file (up to 2MB)
         ]);
-        
         $course = Course::find($request->id);
         
         $image_path = null;
@@ -347,6 +401,33 @@ class CourseController extends Controller
             $semester = $request->semester;
         
             return Course::getCourses($level, $semester);
+    }
+
+
+    public function api_scan(Request $request) {
+        
+        $request->validate([
+            'scanner' => 'required'
+        ], [
+            'scanner.required' => 'Query is required to find courses',
+        ]);
+    
+        $scanner = $request->scanner;
+
+        $scanner = preg_replace('/(\D)(\d)/', "$1 $2", $scanner); 
+        $scanner = preg_replace('/\s+/', '%', $scanner); // this will increase the number of results
+        
+
+        $scan = Course::where('code', 'LIKE', "%$scanner%")
+                        ->orWhere('name', 'LIKE', "%$scanner%")
+                        ->get();
+        if (!$scan) {
+            return response([
+                'message' => 'Course not found'
+            ], 404);
+        }
+        return $scan;
+
     }
 
     public function api_getEnrolledCourses(Request $request) {

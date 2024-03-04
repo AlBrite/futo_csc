@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamp('unlockDuration', false, true)->nullable();
 
             $table->unsignedBigInteger('created_by')->nullable();
-            $table->enum('role', ['admin', 'student', 'advisor'])->default('student');
+            $table->enum('role', ['admin', 'student', 'advisor', 'lecturer'])->default('student');
             $table->unsignedBigInteger('department_id')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

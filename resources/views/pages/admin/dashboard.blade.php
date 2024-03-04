@@ -1,14 +1,144 @@
-@php 
-  $students = \App\Models\Student::all();
-  $results = \App\Models\Result::paginate(6);
+@php
+    $students = \App\Models\Student::all();
+    $results = \App\Models\Result::paginate(6);
 
-  //dd($results);
+    //dd($results);
 
-@endphp 
+@endphp
 
 <x-template title="Admin Dashboard" nav="home">
+    <div class="flex flex-col gap-4 p-4 lg:p-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 lg:gap-4">
 
-  <div class="md:flex flex-1"> 
+            <div class="col-span-1">
+                <div class="box">
+                    <div class="box-body ">
+                        <div class="flex items-center">
+                            <img src="{{ asset('images/img1.png') }}" />
+                            <div class="flex-1">
+                                <div class="flex flex-col items-end">
+                                    <p class="font-semibold">Students</p>
+                                    <div class="text-green-600 font-semibold text-2xl">743</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-span-1">
+                <div class="box">
+                    <div class="box-body">
+                        <div class="flex justify-between items-center">
+                            <img src="{{ asset('images/img2.png') }}" />
+                            <div class="flex-1">
+                                <div class="flex flex-col items-end text-right">
+                                    <p class="font-semibold">Courses</p>
+                                    <div class="text-green-600 font-semibold text-2xl">1504</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-span-1">
+                <div class="box">
+                    <div class="box-body">
+                        <div class="flex items-center">
+                            <img src="{{ asset('images/img4.png') }}" />
+                            <div class="flex-1">
+                                <div class="flex flex-col items-end">
+                                    <p class="font-semibold">Results</p>
+                                    <div class="text-green-600 font-semibold text-2xl">10k</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-span-1">
+                <div class="box">
+                    <div class="box-body">
+                        <div class="flex items-center">
+                            <img src="{{ asset('images/img3.png') }}" />
+                            <div class="flex-1">
+                                <div class="flex flex-col items-end">
+                                    <p class="font-semibold">Lecturers</p>
+                                    <div class="text-green-600 font-semibold text-2xl">20</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="flex flex-col lg:flex-row gap-1 lg:gap-8">
+            <div class="flex-1">
+                <div class="box">
+                    <div class="box-header">
+                        <h2>Student Survey</h2>
+                    </div>
+                    <div class="box-body min-h-[365px]">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1">
+                <div class="box">
+                    <div class="box-header">
+                        <h2>Student Performance Chart</h2>
+                    </div>
+                    <div class="box-body min-h-[365px]">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3">
+            <div class="col-span-1">
+                <div class="box">
+                    <div class="box-header">
+                        <h2>Exam Schedule</h2>
+                    </div>
+                    <div class="box-body flex flex-col gap-2">
+                        <div class="bg-gray-500/20 px-2 py-1.5 rounded-lg flex justify-between">
+                            <span class="pr-2">CSC 502</span>
+                            <span>23-10-2024 @ 10:30am-02:30pm</span>
+                        </div>
+                        <div class="bg-gray-500/20 px-2 py-1.5 rounded-lg flex justify-between">
+                            <span class="pr-2">CSC 401</span>
+                            <span>23-10-2024 @ 02:30pm-05:30pm</span>
+                        </div>
+                        <div class="bg-gray-500/20 px-2 py-1.5 rounded-lg flex justify-between">
+                            <span class="pr-2">CSC 502</span>
+                            <span>23-10-2024 @ 10:00am-12:20pm</span>
+                        </div>
+                        <div class="bg-gray-500/20 px-2 py-1.5 rounded-lg flex justify-between">
+                            <span class="pr-2">CSC 502</span>
+                            <span>23-10-2024 @ 10:30am-01:30pm</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-template>
+<style>
+    body {
+        background: #f0f3fb;
+    }
+</style>
+
+{{-- <div class="md:flex flex-1"> 
       <div class="order-2 md:order-1 md:w-[40%]">
         <div class="scroller">
         <x-todo/>
@@ -245,7 +375,7 @@
                         <th class="w-20">CGPA</th>
                     </thead>
                     <tbody>
-                        @foreach($students as $student)
+                        @foreach ($students as $student)
                             <tr>
                                 <td align="center">
                                 <x-profile-pic :user="$student" alt="student_pic" class="w-10 h-10 rounded-full object-cover"/>
@@ -273,7 +403,7 @@
                           <th class="w-20"></th>
                       </thead>
                       <tbody>
-                          @foreach($results as $result)
+                          @foreach ($results as $result)
                                   
                               <tr>
                                   <td class="uppercase">{{$result->course->code}}</td>
@@ -296,5 +426,4 @@
           </div>
         </div>
       </div>
-  </div>
-</x-template>
+  </div> --}}

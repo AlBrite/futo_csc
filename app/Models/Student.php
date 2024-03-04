@@ -39,20 +39,7 @@ class Student extends Model
     ];
 
 
-   
-
-
-    public static function getFillables(array $data = [])
-    {
-        $class = __CLASS__;
-        $obj = new $class;
-
-        $fillables = $obj->fillable;
-        if (count($data) === 0) {
-            return $fillables;
-        }
-        return Arr::only($data, $fillables);
-    }
+  
 
     public function advisor()
     {
@@ -72,9 +59,10 @@ class Student extends Model
     
     // Function to calculate overall CGPA
     function calculateCGPA(?string $retrieve = 'GPA') {
-        $results = $this->results;
-       
-        //scoreToPoints
+
+        // fetch all approved results
+        $results = $this->results()->where('remark', '!=', 'PENDING')->get();
+
 
         $totalCredits = 0;
         $totalQualityPoints = 0;
@@ -109,6 +97,9 @@ class Student extends Model
 
 
 
+
+
+
     public function scoreToPoints(int $score)
     {
         
@@ -124,7 +115,7 @@ class Student extends Model
 
     public function user()
     {
-        return $this->hasOne(User::class, 'id');
+        return $this->hasOne(User::class, 'id', 'id');
     }
 
     public static function auth()
@@ -183,6 +174,11 @@ class Student extends Model
     }
 
 
+    public static function _create($data) {
+        $obj = new Student();
+        $data = Arr::only($data, $obj->fillable);
+        return self::create($data);
+    }
     
 
 

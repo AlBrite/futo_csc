@@ -1,8 +1,8 @@
 @php 
     use \App\Models\Result;
-    $students = $class->students;
-    //$results = $class->results;
     $session = request()->get('session');
+    $semester = request()->get('semester');
+
 
 
     $courses = \App\Models\Enrollment::where('enrollments.semester', $semester)
@@ -22,11 +22,16 @@
 
     $students = \App\Models\Enrollment::where('enrollments.semester', $semester)
     ->where('enrollments.session', $session)
+    ->join('students', 'students.reg_no', '=', 'enrollments.reg_no')
+    ->join('users', 'users.id', '=', 'students.id')
     ->groupBy('enrollments.reg_no')
     ->get([
         'enrollments.course_id',
-        'enrollments.reg_no'
+        'enrollments.reg_no',
+        'students.cgpa'
     ]);
+
+
 
 
     $score_array = [];
@@ -38,24 +43,32 @@
     $student_results = [];
 
     foreach($students as $student) {
-        $records = ['score'=>$score_array, 'reg_no' => $student->reg_no];
+        $records = [
+            'score' => $score_array,
+            'reg_no' => $student->reg_no,
+            'cgpa' => $student->cgpa
+        ];
+
         $results = \App\Models\Enrollment::where('enrollments.semester', $semester)
-        ->join('results', function($join) {
-            $join->on('enrollments.course_id','=','results.course_id')
-                ->on('enrollments.reg_no', '=','results.reg_no');
-        })
-        ->where('enrollments.session', $session)
-        ->where('enrollments.reg_no', $student->reg_no)
-        ->orderBy('enrollments.course_id')
-        ->get([
-            'results.reg_no',
-            'results.score',
-            'results.lab',
-            'results.exam',
-            'results.test',
-            'results.course_id'
-            ]);
-        ;
+            ->join('results', function($join) {
+                $join->on('enrollments.course_id','=','results.course_id')
+                    ->on('enrollments.reg_no', '=','results.reg_no')
+                    ->on('enrollments.semester', '=','results.semester')
+                    ->on('enrollments.session', '=','results.session');
+            })
+            ->where('enrollments.session', $session)
+            ->where('enrollments.reg_no', $student->reg_no)
+            ->orderBy('enrollments.course_id')
+            ->get([
+                'results.reg_no',
+                'results.score',
+                'results.lab',
+                'results.exam',
+                'results.test',
+                'results.course_id'
+                ]);
+            
+        
         foreach($results as $result) {
             $records['score'][$result->course_id] = $result->score;
 
@@ -85,11 +98,6 @@
         ]);
 
         
-   
-foreach($results as $record) {
-
-    //dd($record);
-}
 @endphp
 
 
@@ -139,9 +147,7 @@ foreach($results as $record) {
             </thead>
             <tbody style="text-align: center;">
                 @foreach($student_results as $n => $student)
-                    @php 
-            //dd($student);
-                    @endphp
+                   
                     <tr>
                         <td style="text-align: left;">{{$n+1}}</td>
                         <td>{{$student['reg_no']}}</td>
@@ -153,7 +159,8 @@ foreach($results as $record) {
                         @php 
                             $gpa = Result::studentGPA($student['reg_no'], $semester, $session);
                             $previewsGPA = Result::studentPreviousSemesterGPA($student['reg_no'], $semester, $session);
-                            $cgpa = Result::studentCGPA($student['reg_no']);
+                           
+                            $cgpa = $student['cgpa'];
 
 
                         @endphp
@@ -166,9 +173,9 @@ foreach($results as $record) {
                         <td>{{$previewsGPA['TNU']}}</td>
                         <td>{{$previewsGPA['GPA']}}</td>
 
-                        <td class="border-l-4 border-green-900">{{$cgpa['TGP']}}</td>
-                        <td>{{$cgpa['TNU']}}</td>
-                        <td>{{$cgpa['GPA']}}</td>
+                        <td class="border-l-4 border-green-900"></td>
+                        <td></td>
+                        <td>{{$cgpa}}</td>
         
                         <td class="border-l-4 border-green-900">PASS</td>
                     </tr>

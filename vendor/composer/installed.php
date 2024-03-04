@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'laravel/laravel',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => NULL,
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '16acc3c107f28b50a38de4e9811dd44f813125c5',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -427,6 +427,15 @@
                 0 => '*',
             ),
         ),
+        'laminas/laminas-diactoros' => array(
+            'pretty_version' => '3.2.0',
+            'version' => '3.2.0.0',
+            'reference' => 'aca73646e658dce3f079f6b8648c651e193e331e',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../laminas/laminas-diactoros',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'laravel/framework' => array(
             'pretty_version' => 'v9.52.16',
             'version' => '9.52.16.0',
@@ -446,11 +455,20 @@
             'dev_requirement' => false,
         ),
         'laravel/laravel' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => NULL,
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '16acc3c107f28b50a38de4e9811dd44f813125c5',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'laravel/nexmo-notification-channel' => array(
+            'pretty_version' => 'v3.3.0',
+            'version' => '3.3.0.0',
+            'reference' => 'b553cca2f2955c146f97b7c5684e08b19450940a',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../laravel/nexmo-notification-channel',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
@@ -956,6 +974,7 @@
             'dev_requirement' => false,
             'provided' => array(
                 0 => '1.0',
+                1 => '^1.1 || ^2.0',
             ),
         ),
         'psr/http-message' => array(
@@ -971,6 +990,7 @@
             'dev_requirement' => false,
             'provided' => array(
                 0 => '1.0',
+                1 => '^1.1 || ^2.0',
             ),
         ),
         'psr/log' => array(
@@ -1550,6 +1570,24 @@
             'reference' => 'b56450eed252f6801410d810c8e1727224ae0743',
             'type' => 'library',
             'install_path' => __DIR__ . '/../voku/portable-ascii',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'vonage/client-core' => array(
+            'pretty_version' => '4.3.2',
+            'version' => '4.3.2.0',
+            'reference' => 'a7db15d14754ce21b0006452e16dd907577c1e4b',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../vonage/client-core',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'vonage/nexmo-bridge' => array(
+            'pretty_version' => '0.1.2',
+            'version' => '0.1.2.0',
+            'reference' => 'e9f63cd468b7e0edd73d0c90d0406d6b961f9eb7',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../vonage/nexmo-bridge',
             'aliases' => array(),
             'dev_requirement' => false,
         ),

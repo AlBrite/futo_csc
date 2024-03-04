@@ -54,7 +54,7 @@
       <label>Advisors</label>
     </a>
 
-    <a href="/admin/lecturers" class="{{$nav=='advisors'?'active':''}}">
+    <a href="/admin/lecturers" class="{{$nav=='lecturers'?'active':''}}">
       <span class="material-symbols-rounded">transfer_within_a_station</span>
       <label>Lecturers</label>
     </a>
@@ -81,7 +81,23 @@
       <label>Results</label>
     </a>
 
-    
+
+  @elseif ($role === 'lecturer')   
+    <a href="/lecturer/students" class="{{$nav=='students'?'active':''}}">
+      <span class="material-symbols-rounded">school</span>
+      <label>Students</label>
+    </a>  
+
+    <a href="/admin/students" class="{{$nav=='students'?'active':''}}">
+      <span class="material-symbols-rounded">school</span>
+      <label>My Course</label>
+    </a>
+
+    <a class="{{$nav == 'results' ? 'active':''}}" href="/moderator/results">
+      <span class="material-symbols-rounded">poll</span>
+      <label>Results</label>
+    </a>
+
 
 
   @else 

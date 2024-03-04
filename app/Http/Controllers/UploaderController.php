@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 
 class UploaderController extends Controller
 {
-    public static function uploadFile($name, $location = null) {
+    public static function uploadFile($name = 'image', $location = null) {
         $location ??= $name .'s';
         $upload_path = storage_path($location);
         if (!is_dir($upload_path)) {
@@ -32,6 +32,6 @@ class UploaderController extends Controller
         if (!$filename) {
             return null;
         }
-        return "storage/$location/$filename";
+        return "$location/$filename";
     }
 }

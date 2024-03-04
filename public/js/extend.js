@@ -35,15 +35,22 @@ export function getAttr(event, attribute, stopAfter = null) {
 export class Location {
     constructor() {}
 
-    static get(name) {
+    static get(name, defaultValue = null) {
         const currentUrl = new URL(window.location.href);
         let queryParams = currentUrl.searchParams;
-        return queryParams.get(name);
+        return queryParams.get(name) ?? defaultValue;
+    }
+    static drop(name) {
+        const currentUrl = new URL(window.location.href);
+        let queryParams = currentUrl.searchParams;
+        queryParams.delete(name);
+        window.history.pushState({}, "", currentUrl.toString());
     }
 
     static set(obj) {
         Location.push(null, obj);
     }
+
 
     static url(url) {
         url = url || window.location.href;
@@ -95,6 +102,7 @@ export class Location {
         Object.keys(data).forEach(key => {
           params.append(key, data[key]);
         });
+       
       
         url = url.toString();
         

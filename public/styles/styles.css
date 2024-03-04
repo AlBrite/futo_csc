@@ -930,8 +930,7 @@ button:disabled {
 
 
 
-.btn,
-.btn-primary,
+
 .btn-secondary,
 .btn-accent,
 .btn-danger,
@@ -940,40 +939,15 @@ button:disabled {
 .btn-black,
 .btn-white,
 .btn-body {
-  padding: 0.5rem;
   font-weight: 600;
   display: inline;
   cursor: pointer;
-  min-width: 6rem;
-  width: auto;
   margin: .5rem 0;
 }
 
-.btn-primary {
-  background-color: var(--primary);
-  color: var(--white);
-}
-.btn-primary:hover {
-  color: var(--white);
-}
 
-.btn-primary:hover {
-  background-color: var(--primary-600);
-}
 
-.btn-secondary {
-  background-color: var(--secondary);
-  color: var(--white);
-}
 
-.btn-secondary:hover {
-  background-color: var(--secondary-600);
-}
-
-.btn-danger {
-  background-color: var(--danger);
-  color: var(--white);
-}
 
 .btn-danger:hover {
   background-color: var(--danger-600);
@@ -1041,8 +1015,6 @@ button:disabled {
   font-weight: 600;
   display: inline;
   cursor: pointer;
-  min-width: 6rem;
-  width: auto;
   margin: .5rem 0;
 }
 
@@ -1191,13 +1163,16 @@ button:disabled {
   border: 1px solid var(--primary);
   padding: .4rem .75rem;
   font-size: .85rem;
-  font-weight: 600;
   line-height: 1.5rem;
-  color: var(--body);
+  color: var(--body-400);
   background-color: var(--white);
   outline: none;
 }
-
+.dark .select>select,
+.dark .file-input>input {
+  border-color: #000;
+  background-color: rgb(39, 39, 42);
+}
 select>label,
 .file-input>label {
   display: block;

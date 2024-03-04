@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('mandatory')->default(1);
             $table->unsignedMediumInteger('grouping_id');
             $table->enum('semester', ['rain', 'harmattan']);
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->string('level', 3);
             $table->unsignedTinyInteger('exam')->default(0);
             $table->unsignedTinyInteger('test')->default(0);

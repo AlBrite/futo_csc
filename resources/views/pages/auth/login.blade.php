@@ -3,63 +3,70 @@
   <head>
     @include('layouts.head')
   </head>
-  <body x-data="{username:'', password:''}">
+  <body ng-init="username=null; password=null" ng-app="cscPortal">
     <div id="overlay"></div>
 
-    <main class="w-[100dvw] h-[100dvh] flex flex-col justify-center items-center">
+
+    <main class="w-[100dvw] h-[100dvh] popup popup-inverse">
      
 
-      <div class="min-h-[26rem] bg-white/50 border-t-4 border-green-600 rounded-lg w-96 flex flex-col gap-10 lg:shadow-lg lg:p-5  justify-center relative z-20  p-8">
-
-        <div class="login--top flex align-center gap-1 p-x-1 pt-2 text-green-700">
+    <form action="/dologin" method="post"  class="popup-wrapper border-t-4 border-green-600 w-96 flex flex-col">
+        @csrf
+        <div class="popup-body flex align-center gap-1 pb-0 text-green-700">
             <img src="{{asset('svg/logo.svg')}}" alt="logo" width="48">
             <div>
                 <p class="font-size-2 text-body-600 font-bold">Department of Computer Science</p>
                 <p class="font-size-1 text-body-400 font-semibold">Federal University of Technolog, Owerri</p>
             </div>
         </div>
-
-        <form action="/dologin" method="post" id="login-form" class="flex flex-col gap-6 text-body-400">
-          @csrf
-          @error('login_info')
-              <x-alert type="error">{{$message}}</x-alert>
-          @enderror
-
-          @if (request()->has('callbackUrl')) 
-              <input type="hidden" name="callbackUrl" value="{{request()->callbackUrl}}"/>
-          @endif
+        <div class="popup-body lg:!p-14">
+    
+          <div class="flex flex-col gap-1">        
           
-
-          
-
-
-          
-          <input type="text" id="username" name="usermail" placeholder="Username or Email"  class="input btn-lg"  x-on:keyup="username=$el.value"/>
-
-          <input type="password" id="password" name="password" placeholder="Password" class="input btn-lg" x-on:keyup="password=$el.value"/>
-            
-
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-1">
-              <input type="checkbox" class="checkbox" name="remember" id="remember">
-              <label for="remember">Remember me.</label>
+            @error('login_info')
+                <x-alert type="error">{{$message}}</x-alert>
+            @enderror
+    
+            @if (request()->has('callbackUrl')) 
+                <input type="hidden" name="callbackUrl" value="{{request()->callbackUrl}}"/>
+            @endif
+            <div class="flex flex-col gap-8">   
+              <input type="email" ng-disabled="false" ng-model="username" id="username" name="usermail" placeholder="Username or Email"  class="input btn-lg" />
+      
+              <input type="password" ng-model="password" id="password" ng-model="password" name="password" placeholder="Password" class="input btn-lg" ng-disabled="!username" />
             </div>
-
-            <a href="/lostpassword" class="hover:underline">Forgot password?</a>
+            
+              
+    
+            <div class="flex items-center justify-between text-xs">
+              <div class="flex items-center gap-1">
+                <input type="checkbox" class="checkbox peer" name="remember" id="remember" ng-disabled="!password" >
+                <label for="remember" class="peer-disabled:opacity-30">Remember me.</label>
+              </div>
+    
+              <a href="/lost-password" class="hover:underline">Forgot password?</a>
+            </div>
+    
+            
+    
           </div>
+        </div>
 
+        <div class="popup-footer">
           <button
-          class="btn-primary transition"
-          type="submit"
-          :disabled="!username||!password"
-          disabled>Sign in</button>
+              class="btn btn-primary transition"
+              type="submit"
+              ng-disabled="!password"
+              >Sign in</button>
+        </div>
 
-        </form>
-      </div>
+      </form>
     </main>
+
+    
     @include('layouts.footer')
     
-    <img src="http://127.0.0.1:8000/svg/frame.svg" alt="frame" class="absolute bottom-0 w-[350px] opacity-50 right-0">
+    <img src="{{asset('svg/frame.svg')}}" alt="frame" class="absolute bottom-0 w-[350px] opacity-50 right-0">
   </body>
   <script>
     (function($) {

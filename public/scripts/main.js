@@ -1,3 +1,5 @@
+
+
 function addEvent(selector, callback, event = 'click') {
   const select = document.querySelectorAll(selector);
   
@@ -71,13 +73,23 @@ function onOverlay() {
   }
 }
 
+window.offOverlay = (time = 500) => {
+  const overlay = id('overlay');
 
-setTimeout(() => {
-    const overlay = document.getElementById('overlay');
-    if (overlay) {
-      overlay.style.display = 'none';
-    }
-}, 100);
+  if (overlay) {
+    setTimeout(() => {
+      
+      id('overlay').style.display = 'none';
+    
+    }, time);
+  }
+}
+
+window.onresize = () => {
+ // window.location.href = window.location.href;
+}
+
+
 
 function handlePrint() {
   window.print(document.body)
@@ -119,17 +131,26 @@ function updatePageContent(route) {
             destination.querySelector('html')?.setAttribute(name, value);
           });
           const footer = htmlDoc.querySelector('#footer-slot');
-          htmlDoc.querySelectorAll('#footer-slot script[src]').forEach(element => {
+          const destinationFooter = document.querySelector('#footer-slot');
+          console.log(footer, destinationFooter);
+      
+          if (destinationFooter && footer) {
+            destinationFooter.innerHTML = '<span id="working"></span>';
+            
+           
 
-            const script = document.createElement('script');
-            script.type = 'module';
-            script.src = element.getAttribute('src');
-            footer.appendChild(script);
-            script.onload = () => {
-                alert('11')
-            };
+            htmlDoc.querySelectorAll('#footer-slot script[src]').forEach(element => {
+      
+              const script = document.createElement('script');
+              script.type = 'module';
+              script.src = element.getAttribute('src');
+              
+              destinationFooter.appendChild(script);
+    
+      
+            });
 
-          });
+          }
 
         } 
         else {
@@ -187,7 +208,7 @@ window.addEventListener('popstate', function(e) {
 
 });
 
-document.querySelectorAll('a[href]').forEach(element => {
+document.querySelectorAll('ax[href]').forEach(element => {
   element.addEventListener('click', e => {
     e.preventDefault();
     const route = element.getAttribute('href');
@@ -256,9 +277,11 @@ const menuToggler = document.querySelector('.sidebar-toggler');
 
 if (menuToggler) {
   menuToggler.addEventListener('click', () => {
-   const menu = document.querySelector('.sidebar-menu');
+   const menu = document.querySelector('.sidebar');
    if (window.innerWidth > 1024) {
-     menu.classList.toggle('full-menu'); 
+     menu.classList.toggle('activate-hovering'); 
+     menu.classList.toggle('closed-sidebar')
+   
    }
    else {
     if (menu.style.display == 'none') {
@@ -269,6 +292,13 @@ if (menuToggler) {
    }
   });
 }
+$(document).on('mouseenter mouseleave', '.sidebar.activate-hovering', function(e) {
+  $(this).toggleClass('closed-sidebar');
+})
+
+$(document).on('click', '.toggle-profile-card', function(){
+  $(this).toggleClass('show');
+})
 
 addEvent('fieldset.input', function(evt){
   const target = evt.target || evt.srcElement;
@@ -296,3 +326,136 @@ addEvent('.click-print', function(event){
 
 });
 
+$(document).on('click', '.popup', function(event) {
+  const dismiss = $(this).find('.popup-dismiss, input[type=submit], input[type=button], button');
+
+  if ($(event.target).is('.popup') && dismiss.length > 0) {
+    dismiss.click();
+  }
+})
+
+window.onbeforeunload = ()=>{
+    onOverlay();
+}
+
+$(function(){
+  $(".sidebar .has-menu").on("click", function(e) {
+    
+    $(".sidebar .has-menu").not(this).removeClass('active');
+    $(this).toggleClass('active');
+
+  });
+  $(".sentence-case").each(function() {
+      var text = $(this).text().toLowerCase();
+      $(this).text(text.charAt(0).toUpperCase() + text.slice(1));
+  });
+});
+$('.h-avail, .h-center').each(function(e){
+  setTimeout(()=>{
+    const offset = $(this).offset();
+    const averiageHeight = Math.ceil($(this).innerHeight()) / 3;
+    $(this).css({
+      '--avail-screen': `${offset.top}px`,
+      '--average-height': `${averiageHeight}px`,
+      'visibility': 'visible'
+    })
+  }, 1000)
+});
+$(function(){
+  let tips = [];
+  const seen = false;
+  let current = 0;
+  
+  $('[tips]').each(function(i) {
+    tips.push($(this));
+  });
+
+  const all = $('[tips]');
+  const showTip = function(index = 0) {
+    const current = $(`[tips]:eq(${index})`);
+    $('.tip-overlay').remove();
+
+
+    if (current.length > 0) {
+      
+      let tipOverlay = $('<div>').addClass('tip-overlay');
+      let tip = $('<div>').addClass('tip');
+      let tipBody = $('<div>').addClass('tip-body').text(current.attr('tips'));
+      let tipHeader = $('<div>').addClass('tip-header');
+      tipHeader.append($('<span>').text('Tips'));
+      tipHeader.append($('<span>').text(`${index+1} of ${all.length}`));
+      let tipFooter = $('<div>').addClass('tip-footer');
+      let tipActions = $("<div>").addClass('tip-actions');
+      let isLast = (index+1) == all.length;
+      
+      let skip = $('<span>').addClass('tip-skip').addClass('tip-action').text('Skip');
+      let next = $('<span>').addClass('tip-next').addClass('tip-action').text(isLast ?'Finish':'Next');
+      next.toggleClass('tip-last', isLast);
+      skip.toggleClass('invisible', isLast);
+  
+      tipActions.append(skip);
+      tipActions.append(next);
+      tipFooter.append(tipActions);
+
+      skip.on('click', function(e) {
+        
+      })
+      next.on('click', function(e) {
+        let count = index + 1; 
+        current.removeClass('activate-tip');
+        showTip(count);
+      
+      })
+
+      tip.append(tipHeader);
+      tip.append(tipBody);
+      tip.append(tipFooter);
+
+      current.addClass('tip-disabled');
+      const position = current.position();
+      const bottom = current.position().top + current.innerHeight();
+      const right = current.position().left + current.innerWidth();
+
+      current.addClass('activate-tip');
+      tip.css({top:bottom + 10, left:position.left});
+
+
+
+
+      tipOverlay.append(tip);
+      $('body').append(tipOverlay);
+      
+
+    }
+  }
+
+  if (all.length > 0) {
+    $('#page-tips').show();
+  }
+  $(document).on('click', '#page-tips', function(e){
+    $('#page-tips').hide();
+    showTip(0);
+  });
+
+
+  $(document).on('contextmenu', '.prepare.loading-skeleton', function(e) {
+    const skeletons = $('.skeleton', this);
+    const mainWidth = $(this).innerWidth();
+
+    if (skeletons.css('display') === 'block') {
+      skeletons.css('display', 'inline-block');
+    }
+
+    skeletons.each(function(e) {
+      //const width = Math.floor(($(this).innerWidth()/mainWidth) * 100);
+      const width = $(this).outerWidth();
+      $(this).addClass(`w-[${width}px]`);
+      $(this).text('');
+    })
+
+    
+  })
+
+  
+
+})

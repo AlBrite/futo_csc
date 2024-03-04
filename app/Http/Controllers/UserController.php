@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -25,6 +26,44 @@ class UserController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/')->with('message', 'You have been logged out');
+    }
+
+
+
+    /**
+     * Display user profile picture
+     * If user has't uploaded profile picture
+     * displays picture based on user gender
+     */
+
+    public function display_picture(User $user) {
+        $image = public_path(match (true) {
+            $user->profile?->gender === 'female' => 'images/avatar-f.png',
+            $user->profile?->gender  === 'male' => 'images/avatar-m.png',
+            default => 'images/avatar-u.png',
+        });
+       
+        if ($user->profile->image && is_file(storage_path($user->profile->image))) {
+            $image = storage_path($user->profile->image);
+        }
+        if (!file_exists($image)) {
+            abort(404);
+        }
+
+        $mime = mime_content_type($image);
+        $filesize = filesize($image);
+
+        header('Content-Type: '.$mime);
+        header('Content-Length: '.$filesize);
+
+        readfile($image);
+        exit;
+    }
+
+
+    /***Displays dashboard view to user based on role*/
+    public function dashboard() {
+        return view("pages." . auth()->user()->role . ".dashboard");
     }
 
 
@@ -97,6 +136,22 @@ class UserController extends Controller
 
         return back()->with('success','Profile UPdated');
 
+    }
+
+
+    /**
+     * Show setting page to users
+     */
+    public function show_settings() {
+        return view('pages.student.settings');
+    }
+
+    /**
+     * Shows user profile page
+     */
+
+    public function show_profile() {
+        return view('pages.'.auth()->user()->role.'.profile');
     }
 
 }

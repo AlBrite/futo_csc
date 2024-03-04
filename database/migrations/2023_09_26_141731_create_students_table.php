@@ -22,6 +22,7 @@ return new class extends Migration
             $table->enum('gender', ['male', 'female'])->nullable();
             $table->integer('level')->nullable();
             $table->string('image')->nullable();
+            $table->decimal('cgpa', 3, 2);
 
 
             $table->string('blood_group')->nullable();

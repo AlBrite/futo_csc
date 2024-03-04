@@ -10,14 +10,14 @@ class DBExportController extends Controller
     {
         // Get all table names in the database
         $tables = DB::select('SHOW TABLES');
-        $exporttable = request()->get('table', 'all');
+        $exporttable = request()->get('table');
 
         // Extract table names from the result
         $tableNames = [];
         foreach ($tables as $table) {
             $values = array_values((array)$table);
             $tableName = $values[0];
-            if ($exporttable !== $tableName) {
+            if ($exporttable && $exporttable !== $tableName) {
                 continue;
             }
             $tableNames[] = $tableName;

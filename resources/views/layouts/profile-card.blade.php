@@ -6,11 +6,10 @@
   $role = $user?->role;
   $profile = $user->$role;
 
-  $set = $profile?->academicSet;
-  $advisor = $set->advisor;
+  $set = $profile?->class;
+  $advisor = $set?->advisor;
   
 @endphp
-<x-right>
   <div class="rounded border border-slate-400 flex flex-col gap-4 items-center px-4 py-16">
     <x-profile-pic :user="$profile" src="{{asset('images/user.jpg')}}" alt="Student-Image" class="object-cover aspect-square rounded-full w-32"/>
 
@@ -67,4 +66,3 @@
       </div>
       <img src="{{asset('svg/frame.svg')}}" alt="frame" class="absolute bottom-0 right-0">
   </div>
-</x-right>

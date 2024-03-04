@@ -123,4 +123,4 @@ document.querySelectorAll("form input[type=submit]").forEach((element) =>{
 
 // Start observing the document
 observer.observe(document.body, observerConfig);
-alert('Dne');
+alert('Dne')

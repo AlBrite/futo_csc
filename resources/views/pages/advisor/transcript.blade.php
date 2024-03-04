@@ -3,7 +3,7 @@
     $set = $advisor->academicSet;
     $students = $set->students()->paginate(10);
 @endphp
-<x-user-layout active="transcripts" title="Transcript" data="{reg_no:null, name: null}">
+<x-template nav="transcripts" title="Transcript" data="{reg_no:null, name: null}">
     <h1 class="text-lg text-body-300 font-semibold">Transcipts</h1>
     <span class="font-semibold text-sm text-primary">Click 
         <a target="_blank" href="./generated-transcript"
@@ -176,4 +176,4 @@
             </form>
         </div>
     </div>
-</x-user-layout>
+</x-template>

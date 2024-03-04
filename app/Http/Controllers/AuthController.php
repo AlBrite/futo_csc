@@ -2,40 +2,58 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Device;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
+
+    public function verifyOTP(Request $request) {
+        $otp = [];
+        $session = session();
+        $otp_user_id = $session->get('otp_user_id');
+        $storedOTP = session()->get('otp');
+
+        if (!$storedOTP || !$otp_user_id) {
+            return redirect()->back()->with('error', 'OTP has expired. Please try again');
+        }
+
+       
+      for($i = 1; $i <= 6; $i++) {
+        $value = $request->get('otp'.$i);
+        if (!is_numeric($value)) {
+            return redirect()->back()->with('error', 'Invalid OTP value');
+        }
+        $otp[] = $value;;
+      }
+      $otp = (int) implode('', $otp);
+
+      if ($otp !== $storedOTP) {
+            return redirect()->back()->with('error', 'Invalid OTP value');
+      }
+      
+      $user = User::find($otp_user_id);
+
+      if (Auth::loginUsingId($otp_user_id)) {
+        Session::forget('otp_user_id');
+        Session::forget('otp');
+        Device::store();
+      }
+
+      return redirect('/');
+
+    }
  
 
-    public function dashboard() {
-        if (!auth()->check()) {
-            return redirect()->route('login');
-        }
 
-        $authUser = auth()->user();
-        $role = $authUser->role;
+   
 
-        return view("pages.$role.dashboard", [
-            'user' => $authUser
-        ]);
-
-    }
-
-    public function profile(string $username)
-    {
-        $profile = User::findUser($username);
-        if (!$profile) {
-            abort(404, "PROFILE NOT FOUND");
-        }
-       
-        return view("{$profile->role}.profile", compact('profile'));
-    }
     public function apiLogin(Request $request) {
         
         
@@ -46,9 +64,12 @@ class AuthController extends Controller
        
     }
 
+
+
     public function attemptLogin(Request $request, Closure $callback, )
     {
         $retryLimit = 5;
+
 
         $field = $this->credential();
 
@@ -75,7 +96,7 @@ class AuthController extends Controller
         if ($unlockDuration && strtotime($unlockDuration) > time()) {
             return response([
                 'message' => 'Account is locked',
-            ]);
+            ], 401);
         }
 
         
@@ -139,6 +160,9 @@ class AuthController extends Controller
 
     public function login()
     {
+        if (session('otp_user_id')) {
+            return redirect('/otp');
+        }
         return view('pages.auth.login');
     }
 
@@ -302,6 +326,8 @@ class AuthController extends Controller
         $username = $this->credential();
         $callbackUrl = $request->callbackUrl;
         
+        
+        
         $request->validate([
             'usermail' => 'required',
             $username => 'required',
@@ -330,6 +356,20 @@ class AuthController extends Controller
             return back()->withErrors(['login_info' => 'Account has been locked']);
         } elseif (auth()->attempt($credentials, $request->filled('remember'))) {
             $auth = Auth::user();
+
+            // Check if the user is trying to login with a new device
+            // if it's a new device, log him/out out the temporary save his session
+            // take the user to otp page
+            if (!Device::check()) {
+
+                $otp = 111111;
+
+                Session()->put('otp', $otp);
+                Session()->put('otp_user_id', auth()->id());
+                auth()->logout();
+                return redirect('/otp');
+            }
+            
             $token = $auth->createToken($auth->role)->plainTextToken;
 
             Session()->put('tokenkey', $token);
