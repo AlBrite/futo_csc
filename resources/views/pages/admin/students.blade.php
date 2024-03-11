@@ -10,61 +10,72 @@
 @endphp
 
 <x-template nav="students">
-    <div ng-init="init()" ng-controller="StudentController"
-        class="lg:flex gap-5 px-0 justify-between items-stretch max-h-full min-h-full overflow-hidden">
+    <div  ng-init="init()" ng-controller="StudentController"
+        class="pt-10 lg:pt-0 flex flex-col lg:flex-row gap-5 px-0 justify-between items-stretch max-h-full min-h-full overflow-hidden">
         <div ng-class="{'lg-visible': student}"
-            class="lg:w-[380px] lg:bg-zinc-50 lg:border-r lg:border-zinc-200 dark:border-none dark:bg-zinc-950/50">
-            <div class="scroller" ng-controller="SearchController">
-                <form class="flex items-center justify-between gap-2 w-full flex-wrap p-5">
+            class="order-2 lg:order-1 lg:w-[380px] lg:bg-zinc-50 lg:border-r lg:border-zinc-200 dark:border-none dark:bg-zinc-950/50">
+            <div class="h-available lg:m-5" ng-controller="SearchController">
+                <div class=" bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
+                    <form
+                        class="flex items-center justify-between gap-2 w-full flex-wrap  p-5 border-b dark:border-white/25 ">
 
-                    <div class="flex-1">
-                        <input type="search" ng-model="query" class="input w-full" ng-keyup="search()"
-                            placeholder="Enter Student Name or Reg No" />
-                    </div>
-
-                </form>
-
-                <div class="student-list" ng-show="results.length == 0">
-                    @foreach ($students as $student)
-                        <div student_id="{{ $student->id }}" ng-click="show($event)" class="student">
-                            <x-profile-pic :user="$student" alt="student_pic"
-                                class="w-16 h-16 rounded-md object-cover" />
-                            <div class="flex-1">
-                                <div class="font-2xl font-bold">{{ $student->user->name }}</div>
-                                <div class="text-sm">{{ $student->reg_no }}</div>
-                                <div class=" text-xs">
-
-                                    <span class="pr-2 border-r border-slate-500/50">{{ $student->level }}
-                                        Level</span><span class="pl-2">{{ $student->calculateCGPA() }} CGPA</span>
-
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-                <div class="student-list" ng-show="results.length > 0">
-                    <div ng-repeat="student in results track by student.id">
-
-                        <div student_id="{% student.id %}" ng-click="show($event)" class="student">
-                            <img ng-src="/profilepic/{% student.id %}" alt="student_pic"
-                                class="w-16 h-16 rounded-md object-cover" />
-                            <div class="flex-1">
-                                <div class="font-2xl font-bold">{% student.name %}</div>
-                                <div class="text-sm">{% student.reg_no %}</div>
-                                <div class=" text-xs">
-
-                                    <span class="pr-2 border-r border-slate-500/50">{% student.level %}
-                                        Level</span><span class="pl-2">{% student.cgpa %} CGPA</span>
-
-                                </div>
-                            </div>
+                        <div class="flex-1">
+                            <input type="search" ng-model="query" class="input w-full" ng-keyup="search()"
+                                placeholder="Enter Student Name or Reg No" />
                         </div>
 
+                    </form>
+                    <div class="scroller">
+                        <div class="flex flex-col h-full  rounded-md">
+                            <div class="student-list" ng-show="results.length == 0">
+                                    @foreach ($students as $student)
+                                        <div student_id="{{ $student->id }}" ng-click="show($event)" class="student">
+                                            <x-profile-pic :user="$student" alt="student_pic"
+                                                class="w-16 h-16 rounded-md object-cover" />
+                                            <div class="flex-1">
+                                                <div class="font-2xl font-bold">{{ $student->user->name }}</div>
+                                                <div class="text-sm">{{ $student->reg_no }}</div>
+                                                <div class=" text-xs">
+
+                                                    <span
+                                                        class="pr-2 border-r border-slate-500/50">{{ $student->level }}
+                                                        Level</span><span class="pl-2">{{ $student->calculateCGPA() }}
+                                                        CGPA</span>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+
+
+                                
+                                <div class="student-list" ng-show="results.length > 0">
+                                    <div ng-repeat="student in results track by student.id">
+
+                                        <div student_id="{% student.id %}" ng-click="show($event)" class="student">
+                                            <img ng-src="/profilepic/{% student.id %}" alt="student_pic"
+                                                class="w-16 h-16 rounded-md object-cover" />
+                                            <div class="flex-1">
+                                                <div class="font-2xl font-bold">{% student.name %}</div>
+                                                <div class="text-sm">{% student.reg_no %}</div>
+                                                <div class=" text-xs">
+
+                                                    <span class="pr-2 border-r border-slate-500/50">{% student.level %}
+                                                        Level</span><span class="pl-2">{% student.cgpa %} CGPA</span>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="lg:flex-1 ">
+        <div class="order-1 lg:order-2 flex-1 ">
             <div class="scroller">
                 <div class="flex justify-between items-center">
                     <div class="lg:invisible flex items-center cursor-pointer" ng-click="back()">
@@ -79,8 +90,8 @@
 
                 </div>
 
-                <div ng-hide="student" profile-skeleton></div>
-                
+                <div ng-class="{'lg-visible': !student}" ng-hide="student" profile-skeleton></div>
+
                 <div ng-show="student">
 
                     <div class="">

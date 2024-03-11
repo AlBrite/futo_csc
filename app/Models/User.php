@@ -347,7 +347,7 @@ class User extends Authenticatable
 
 
     public function todos() {
-        return $this->hasMany(Todo::class);
+        return $this->hasMany(Todo::class)->orderBy('created_at', 'DESC');
     }
 
 
@@ -367,6 +367,33 @@ class User extends Authenticatable
             default => 'images/avatar-u.png',
         });
     }
+
+
+    public function incrementLogAttempts() {
+        $this->logAttempts++;
+
+        $this->update([
+            'logAttempts' => $this->logAttempts
+        ]);
+    }
+    
+    public function lockAccount(int $unlockDuration) {
+        $logAttempts = 4;
+        $this->update(compact('logAttempts', 'unlockDuration'));   
+    }
+
+    public function unlockAccount() {
+        $unlockDuration = null;
+        $logAttempts = 0;
+        $this->update(compact('logAttempts', 'unlockDuration'));
+    }
+
+
+    public function isLocked() {
+        return $this->unlockDuration && $this->unlockDuration > time();
+    }
+
+
 
     
 }

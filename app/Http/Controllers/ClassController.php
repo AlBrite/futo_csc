@@ -16,6 +16,10 @@ class ClassController extends Controller
         return AcademicSet::all();
     }
 
+    public function add() {
+        return view('pages.admin.add-class');
+    }
+
     public function api_fetchClass(Request $request) {
         
         $class = AcademicSet::where('name', '=', $request->get('class_name'))
@@ -27,6 +31,10 @@ class ClassController extends Controller
 
     public function show() {
         return  view('pages.advisor.class');
+    }
+
+    public function show_to_admin() {
+        return view('pages.admin.classes');
     }
 
 

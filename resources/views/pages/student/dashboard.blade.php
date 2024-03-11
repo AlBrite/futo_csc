@@ -1,12 +1,29 @@
 @php
+
     $user = \App\Models\User::active();
     $student = $user->student;
     $records = $student->courses;
     $set = $student->academicSet;
     $enrolledCourses = $student->courses;
+    $carryoverCourses = $student->carryoverCourses();
+    $results = $student->results->count();
+    $cgpa = $student->calculateCGPA();
+    $materials = $student->getMaterials();
+    
+    //  $cgpa = $student->cgpa;
+    /*
+        size
+        uploader
+        course_code
+        url
+        type
+        name
+    */
 
+    //    dd($materials);
 @endphp
-<x-template nav="home" title="Student Dashboard">
+<x-template nav="home" title="Student Dashboard" minimize>
+    <script src="{{ asset('js/apexchart.js') }}"></script>
     @if ($records && $records->count() === 0)
         <div id="no-courses" class="flex h-full p-2 overflow-y-scroll relative flex-col gap-5 items-center">
             <img class="w-72" src="{{ asset('svg/no_courses.svg') }}" alt="no_courses_icon" />
@@ -25,93 +42,134 @@
             </div>
         </div>
     @else
-        <div class="">
-            <h1 class="text-lg text-body-300 font-semibold">Dashboard</h1>
-            <div class="flex flex-col gap-3 lg:gap-5">
-                <div class="courses mt-2 grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- DASHBOARD CARD -->
-                    <div class="col-span-1 overflow-hidden bg-primary-50 rounded-md h-40 p-4 flex flex-col justify-between shadow">
-                        <div class="flex items-center gap-2 text-black-300">
-                            <span class="material-symbols-rounded">
-                                auto_stories
-                            </span>
-                            <p>Courses Registered</p>
-                        </div>
-                        <div class="flex justify-end text-primary-300">
-                            <p class="text-[2.5rem] font-semiboold">71</p>
-                        </div>
-                    </div>
+        <div class="flex lg:ml-6 gap-5">
+            <div class="flex-1">
+                <div class="scroller">
+                    <div class="flex flex-col gap-5 py-6">
+                        
 
-                    <div
-                        class="col-span-1 overflow-hidden bg-secondary-50 dark:bg-orange-900 rounded-md h-40 p-4 flex flex-col justify-between shadow">
-                        <div class="flex items-center gap-2 text-black-300 text-secondary-300">
-                            <span class="material-symbols-rounded">
-                                bar_chart
-                            </span>
-                            <p>Results Published</p>
-                        </div>
-                        <div class="flex justify-end text-secondary-300">
-                            <p class="text-[2.5rem] font-semiboold">55</p>
-                        </div>
-                    </div>
+                        <div class="flex gap-5 h-full justify-between items-stretch">
+                            <div class="flex-1 flex flex-col gap-6">
+                                @include('charts.student-statistics')
 
-                    <div class="col-span-1 overflow-hidden bg-danger-50 rounded-md h-40 p-4 flex flex-col justify-between shadow">
-                        <div class="flex items-center gap-2 text-black-300">
-                            <span class="material-symbols-rounded">
-                                grade
-                            </span>
-                            <p>CGPA</p>
-                        </div>
-                        <div class="flex justify-end text-danger-300">
-                            <p class="text-[2.5rem] font-semiboold">{{ auth()->user()->student->calculateCGPA() }}</p>
+
+                                <div>
+                                    <div class="dashboard-cards !grid-cols-2 col-span-1">
+        
+        
+                                        <div class="box card-orange">
+                                            <div class="card-box">
+                                                <span class="material-symbols-rounded">
+                                                    book
+                                                </span>
+                                            </div>
+                                            <div class="box-body rounded-lg flex flex-col w-full text-right justify-end">
+                                                <div class="card-session">Courses Registered</div>
+                                                <div class="card-counter">{{ $enrolledCourses->count() }}</div>
+                                            </div>
+        
+        
+        
+        
+                                        </div>
+        
+                                        <div class="box card-blue">
+                                            <div class="card-box">
+                                                <span class="material-symbols-rounded">
+                                                    bar_chart
+                                                </span>
+                                            </div>
+                                            <div class="box-body rounded-lg flex flex-col w-full text-right justify-end">
+                                                <div class="card-session">Results</div>
+                                                <div class="card-counter">{{$results }}</div>
+                                            </div>
+                                            @if ($count = count($carryoverCourses))
+                                                <div class="box-footer">
+                                                    {{ $count }} {{ str_plural('carryover', $count) }}
+                                                </div>
+                                            @endif
+        
+        
+                                        </div>
+        
+        
+        
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-[36%]">
+                                <div class="flex flex-col gap-5">
+                                    <div class="shadow-lg text-white rounded-lg h-full p-8"
+                                        style="background: radial-gradient(rgb(22, 163, 74), #19532e);">
+                                        <div class=" text-4xl font-extrabold">GPA</div>
+                                        <div class="font-semibold">Grading Point Average</div>
+                                        <div class="text-7xl font-extrabold mt-5">
+                                            {{ $cgpa }}
+                                        </div>
+                                    </div>
+
+                                    <x-todo/>
+                                    
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="shrink-0 lg:w-[280px] bg-green-50 dark:bg-zinc-800">
+                
+                <div class="scroller !overflow-y-scroll">
+                    <div class="lg:py-5">
+                        <x-calendar />
 
-                <div class="box">
-                    <h1 class="box-header text-body-300 font-semibold !pt-10 !pl-10">Semester Courses</h1>
+                        <div class="box">
+                            <div class="box-header !pb-0 !text-xs">Materials</div>
+                            <div class="box-body">
 
-                    <div class="box-body">
-
-
-                        <table class="responsive-table table-auto">
-                            <thead>
-                                <th class="w-20">Course Code</th>
-                                <th>Course Title</th>
-                                <th class="w-20 text-center">Units</th>
-                                <th class="w-20">Type</th>
-                                <th class="w-20"></th>
-                            </thead>
-                            <tbody>
-
-                                @foreach ($records as $record)
-                                    <tr>
-                                        <td class="uppercase">{{ $record->course->code }}</td>
-                                        <td>{{ $record->course->name }}</td>
-                                        <td class="text-center">{{ $record->course->units }}</td>
-                                        <td class="uppercase">
-                                            {{ $record->course->mandatory === 0 ? 'ELECTIVE' : 'COMPULSORY' }}</td>
-                                        <td>
-
-                                            <a href="/course/{{ $record->course->id }}"
-                                                class="text-xs font-semibold p-[.3rem] rounded text-white bg-[var(--primary)] hover:bg-[var(--primary-700)] transition inline-block text-center">View
-                                                details</a>
-
-                                            <!-- <button id="{{ $record->course->id }}" @click="retrieveCourse, courseId={{ $record->course->id }}"
-                                            class="text-xs font-semibold p-[.3rem] rounded text-white bg-[var(--primary)] hover:bg-[var(--primary-700)] transition"
-                                            type="button">
-                                            View details
-                                        </button> -->
-                                        </td>
-                                    </tr>
+                                @foreach ($materials as $material)
+                                
+                                    <div class="flex justify-between gap-2 !text-xs w-full border-b border-zinc-300 dark:border-zinc-800 last:border-none py-2.5 last:pb-0">
+                                        <div class="w-[calc(100%-3rem)] flex gap-2">
+                                            <img src="{{asset('svg/icons/'.$material->extension.'.png')}}" class="w-5 h-5"/>
+                                            <div class="flex-1">
+                                                <p
+                                                    class="font-semibold whitespace-nowrap text-ellipsis overflow-hidden w-[130px]">
+                                                    {{ $material->name }}</p>
+                                                <span class="font-extralight text-xs">.{{ $material->extension }}, {{ formatFileSize($material->size) }}</span>
+                                                <p class="italic text-xs opacity-60">Shared {{timeago($material->created_at)}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="shrink-0 w-2.6rem">
+                                            <x-tooltip label="Delete">
+                                            <i class="material-symbols-rounded !text-sm !w-3.5 !h-3.5">delete</i>
+                                            </x-tooltip>
+                                            
+                                            <x-tooltip label="Save">
+                                            <a target="blank" rel="download" href="{{asset('storage/'.$material->url)}}" class="material-symbols-rounded !text-sm !w-3.5 !h-3.5">download</a>
+                                            </x-tooltip>
+                                        </div>
+                                    </div>
                                 @endforeach
 
-                            </tbody>
-                        </table>
+                            </div>
+                            <div class="cd-f">
+                                {{$materials->links()}}
+                            </div>
+                        </div>
 
                     </div>
                 </div>
             </div>
-        </div>
     @endif
+
+
+
+
+    <style>
+        #main-slot {
+            padding: 0px;
+            margin: 0px;
+        }
+    </style>
+
 </x-template>

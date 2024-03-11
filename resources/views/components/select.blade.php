@@ -1,34 +1,61 @@
-@props(['name','type','id', 'manual', 'onSelect', 'placeholder', 'attrs',
+@props(['name', 'placeholder', 'disabled', 'dir', 'max', 'relative', 'onchange', 'relative', 'class'])
+@php
+    $defaults = [
+        'name' => '',
+        'placeholder' => 'Select',
+        'disabled' => 'false',
+        'dir' => 'top-right',
+        'max' => 3,
+        'relative' => '',
+        'onchange' => '',
+        'relative' => 'form',
+        'disabled' => false,
+        'class' => '',
+    ];
 
-'bind_selected',
-])
-@php 
-  $defaults = ['type'=>'text', 'manual'=>false, 'id'=>uniqid($name),'onSelect'=> null, 'placeholder'=>'','attrs'=>'',
-  'bind_selected'=>''];
-  foreach($defaults as $default => $value) {
-    if (!isset($$default)) {
-      $$default = $value;
+    foreach ($defaults as $key => $value) {
+        if (!isset($$key)) {
+            $$key = $value;
+        }
     }
-  }
-
-$selection = uniqid('selection'.$name);
-$bind_selected = "x-bind:selected=\"$bind_selected\"";
-  
 @endphp
-<div x-data="{ {{$selection}} :null }">
-  <span x-show="{{$selection}}!='manual'">
-    <x-tooltip label="{{$placeholder}}">
-      <select  class="input-sm" {!! $attrs !!} name="{{$name}}" id="{{$id}}" x-on:change="{{$selection}}=$el.value;{{$onSelect}}">
-        <option value="">{{$placeholder}}</option>
-        {{$slot}}
+<div ng-controller="DropdownController"
+    ng-init="name='{{ $name }}'; dir='drop-{{ $dir }}'; max='{{ $max }}'; placeholder='{{ $placeholder }}'; relative='{{ $relative }}'; onchange='{{ $onchange }}';texts=['{{ $placeholder }}'];init()"
+    class="inline-block">
+    <x-tooltip label="{{ $placeholder }}" ng-hide="show">
+        <span class="dropdown {% dir %} ignore {{ $class }}"
+            ng-class="{'show': show, 'pointer-events-none opacity-50': {{ $disabled ? 'true' : 'false' }}}"
+            data-placeholder="{{ $placeholder }}" {{ $attributes }}>
 
-        @if($manual) 
-          <option value="manual">Manual</option>
-        @endif
-      </select>
+            <div ng-show="show"
+                style="position:fixed;left:0;top:0;bottom:0;width:100%;height:100%;z-index:1000;background:rgba(0,0,0,0.02)"
+                ng-click="show=false"></div>
+
+            <input type="hidden" ng-model="{{ $name }}" ng-repeat="input in inputs" name="{%name%}"
+                value="{%input%}" />
+            <span class="inputArea"></span>
+            <button class="dropdown-toggle input relative z-[999] text-sm" ng-class="{'z-1000':show}" type="button"
+                id="dropdownMenuButton" aria-haspopup="true" aria-expanded="false" ng-click="toggleDropdown($event)">
+
+                <span ng-show="texts.length > 0" class="flex items-center justify-between gap-1">
+                    <span class=" max-w-[60px] h-4 whitespace-nowrap overflow-hidden text-ellipsis inline-block"
+                        ng-bind="displayText()"></span> <span class="opacity-50 text-xs" ng-bind="extra()"></span>
+                </span>
+                <span ng-bind="show ? 'expand_less' : 'expand_more'"
+                    class="material-symbols-rounded text-body-800 cursor-pointer select-none ">
+                    expand_more
+                </span>
+            </button>
+            <span class="dropdown-menu !z-[1000]" ng-class="{'xinvisible':show, 'invisible':!visible}"
+                aria-labelledby="dropdownMenuButton" relative="{{ $relative }}">
+                <span class="dropdown-header">{{ $placeholder }}</span>
+                <span class="dropdown-body">
+                    {{ $slot }}
+                   
+                    <marquee ng-show="multiple" class="dropdown-footer">Ctrl to select more</marquee>
+                </span>
+            </span>
+
+        </span>
     </x-tooltip>
-  </span>
-  <span x-cloak x-show="{{$selection}}=='manual'">
-    <x-input type="{{$type}}" placeholder="{{$placeholder}}" x-bind:name="{{$selection}}=='manual'?'{{$name}}':'{{$selection}}'"/>
-  </span>
 </div>

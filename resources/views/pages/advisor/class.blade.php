@@ -20,7 +20,7 @@
 @endphp
 
 
-<x-template nav="students">
+<x-template nav="class">
     <div ng-init="init()" ng-controller="StudentController"
         class="lg:flex gap-5 px-0 justify-between items-stretch max-h-full min-h-full overflow-hidden">
 

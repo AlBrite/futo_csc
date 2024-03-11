@@ -1,73 +1,70 @@
-@props(['title', 'nav', 'data', 'module'])
-@php 
+@props(['title', 'nav', 'data', 'module', 'minimize'])
+@php
+    use Illuminate\Support\Facades\Session;
+    use Illuminate\Support\Arr;
 
-  use Illuminate\Support\Arr;
-  $htmlClass = Cookie::get('darkMode') === 'true' ? 'dark':'';
+    $htmlClass = Cookie::get('darkMode') === 'true' ? 'dark' : '';
 
-  $defaults = ['title'=>'CSC Admin Portal', 'nav'=>'', 'data'=>''];
-  foreach($defaults as $default=>$value) {
-    if (!isset($$default)) {
-      $$default = $value;
+    $defaults = ['title' => 'CSC Admin Portal', 'nav' => '', 'data' => ''];
+    foreach ($defaults as $default => $value) {
+        if (!isset($$default)) {
+            $$default = $value;
+        }
     }
-  }
-  if (strlen($data) > 0) {
-    $data .= ',';
-  }
+    if (strlen($data) > 0) {
+        $data .= ',';
+    }
 
-  if (!isset($module)) {
-    $module = $nav;
-  }
-  
-  
+    if (!isset($module)) {
+        $module = $nav;
+    }
 
-    
-  $role = 'guest';
-  
-  if (auth()->check()) {
-    $role = auth()->user()->role;
-  } 
-  
-@endphp 
+    $role = 'guest';
+
+    if (auth()->check()) {
+        $role = auth()->user()->role;
+    }
+    $active_nav = $nav;
+    if (isset($active)) {
+        $active_nav = $active;
+    }
+
+    if (!isset($minimize)) {
+        $minimize = false;
+    }
+
+@endphp
 <!DOCTYPE html>
-<html lang="en" ng-cloak ng-app="cscPortal" ng-controller="RootController" ng-class="{'dark': darkMode}"  ng-resize="handleResize()" class="{{$htmlClass}}" ng-init="small=window.innerWidth" custom-on-change>
-  <head>
-    @include('layouts.head', ['title'=>$title])
-    
-  </head>
-  <body class="page-{{$role}} select-none">
-      <div id="overlay"  class="dark:bg-black hidden">
-        <img src="{{asset('svg/logo.svg')}}" alt="" class="animate-pulsing">
-        
-        <noscript>
-          <style>
-            #overlay img, #overlay .spinner {display:none}
-            #overlay {
-              background-color: rgb(247,250,252);
-            }
-          </style>
-          <span class="uppercase text-gray-500 tracking-wider text-lg">
-            You need to enable your javascript to access this site
-          </span>
-        </noscript>
-      </div>
+<html lang="en" ng-cloak ng-app="cscPortal" ng-controller="RootController" ng-class="{'dark': darkMode}"
+    ng-resize="handleResize()" class="{{ $htmlClass }}" ng-init="init()" custom-on-change>
 
-      @include('partials.alerts')
+<head>
+    @include('layouts.head', ['title' => $title])
+
+</head>
+
+<body class="page-{{ $role }} select-none">
+    @include('partials.popup-alert')
+
+    <x-overlay />
 
 
 
 
     <div class="lg:flex items-stretch h-screen relative">
 
-      @include('layouts.aside', compact('nav', 'role'))
+        @include('layouts.aside', compact('nav', 'role', 'minimize'))
 
-      <div class="lg:flex flex-1 flex-col h-full">
-        @include('layouts.header')
-        <main id="main-slot">
-          
-            {{$slot}}
+        <div class="lg:flex flex-1 flex-col h-full">
+            @include('layouts.header')
+            <main id="main-slot">
+                
 
-        </main>
-    </div>
-  </body>
-  @include('layouts.footer')
+                {{ $slot }}
+
+            </main>
+        </div>
+</body>
+@include('layouts.footer')
+
 </html>

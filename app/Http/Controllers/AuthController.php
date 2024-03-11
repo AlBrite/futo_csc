@@ -14,12 +14,16 @@ use Illuminate\Support\Facades\Session;
 class AuthController extends Controller
 {
 
+    private function generateOTP(){
+        return 111111;
+    }
     public function verifyOTP(Request $request) {
         $otp = [];
         $session = session();
         $otp_user_id = $session->get('otp_user_id');
         $storedOTP = session()->get('otp');
-
+        
+        
         if (!$storedOTP || !$otp_user_id) {
             return redirect()->back()->with('error', 'OTP has expired. Please try again');
         }
@@ -34,16 +38,21 @@ class AuthController extends Controller
       }
       $otp = (int) implode('', $otp);
 
-      if ($otp !== $storedOTP) {
-            return redirect()->back()->with('error', 'Invalid OTP value');
-      }
+      Device::store($otp_user_id);
       
-      $user = User::find($otp_user_id);
-
-      if (Auth::loginUsingId($otp_user_id)) {
-        Session::forget('otp_user_id');
-        Session::forget('otp');
-        Device::store();
+      if ($otp !== $storedOTP) {
+          return redirect()->back()->with('error', 'Invalid OTP value');
+        }
+        
+        $user = User::find($otp_user_id);
+        
+        
+        if (Auth::loginUsingId($otp_user_id)) {
+            Session::forget('otp_user_id');
+            Session::forget('otp');
+            
+            
+            return redirect('/')->with('success', 'Account logged in');
       }
 
       return redirect('/');
@@ -66,85 +75,6 @@ class AuthController extends Controller
 
 
 
-    public function attemptLogin(Request $request, Closure $callback, )
-    {
-        $retryLimit = 5;
-
-
-        $field = $this->credential();
-
-        $fields = $request->validate([
-            'usermail' => 'required',
-            $field => 'required',
-            'password' => 'required'
-        ]);
-        
-
-        $user  = User::where($field, $fields[$field])->first();
-       
-        // Check if user exists
-        if (!$user) {
-            return response([
-                'error' => 'Account not found'
-            ]);
-        }
-
-            
-        $unlockDuration = $user->unlockDuration;
-
-        // check if account is locked
-        if ($unlockDuration && strtotime($unlockDuration) > time()) {
-            return response([
-                'message' => 'Account is locked',
-            ], 401);
-        }
-
-        
-        // Check if password is not correct
-        else if (!Hash::check($fields['password'], $user->password)) {
-
-            $attempts = $user->logAttempts + 1;
-
-            
-            
-            if ($attempts >= $retryLimit) {
-                // Lock user account after reach retry limit
-                $user->update([
-                    'unlockDuration' => date('Y-m-d H:i:s',time() + 15 * 60) // unlock after 10 minutes
-                ]);
-
-                return response([
-                    'message' => 'Account has been locked',
-                ], 401);
-            }
-
-            // Keep track of failed attempts
-            $user->update([
-                'logAttempts' => $attempts
-            ]);
-
-            return response([
-                'message' => 'Invalid credentials'
-            ], 401);
-        }
-
-        // if this section is reached, it means unlockDuration has expired or
-        // User credentials are valid
-
-        // reset logAttempts to 0
-        $user->update([
-            'logAttempts' => 0
-        ]);
-
-        auth()->login($user);
-        $token = $user->createToken('myApp')->plainTextToken;
-
-        return response([
-            'user' => $user,
-            'access_token' => $token
-        ]);
-        
-    }
 
 
     public function credential()
@@ -158,8 +88,16 @@ class AuthController extends Controller
 
 
 
-    public function login()
+    public function login(Request $request)
     {
+        if (AuthController::locked_user() && request()->get('change') !== 'user') {
+            $redirect = '/lockscreen';
+            if ($request->callbackUrl) {
+                $redirect .='?callbackUrl='.urlencode($request->callbackUrl);
+            }
+            
+            return redirect($redirect);
+        }
         if (session('otp_user_id')) {
             return redirect('/otp');
         }
@@ -187,12 +125,25 @@ class AuthController extends Controller
     
     public function doLogout(Request $request) {
 
+       $cookie = cookie()->forget('locked_user_id');
         auth()->logout();
+        
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/')->with('message', 'You have been logged out');
+        return redirect('/')->with('message', 'You have been logged out')->withCookie($cookie);
+    }
+
+    public static function locked_user() {
+        $locked_user = request()->cookie('locked_user_id');
+        if ($locked_user) {
+            $user = User::find($locked_user)
+                ->get()
+                ->first();
+            return $user;
+        }
+        return null;
     }
 
 
@@ -321,11 +272,19 @@ class AuthController extends Controller
         }
     }
 
-    public function doLogin(Request $request)
+    
+
+  
+    
+
+
+   
+
+
+    public function api_login(Request $request)
     {
         $username = $this->credential();
         $callbackUrl = $request->callbackUrl;
-        
         
         
         $request->validate([
@@ -344,52 +303,81 @@ class AuthController extends Controller
             $logAttempts = $user->logAttempts;
             $logAttempts++;
         }
+        
+        
 
         $credentials = $request->only($username, 'password');
         $limit = 5;
 
+        
+        if (!$user) {
+            return response([
+                'message' => 'Invalid credentials',
+            ], 401);
+        }
+        
+        
         if (($logAttempts + 1) === $limit) {
             //session()->set()
         }
+      
+        if ($logAttempts >= 5 && $user->isLocked()) {
 
-        if ($logAttempts >= 5) {
-            return back()->withErrors(['login_info' => 'Account has been locked']);
-        } elseif (auth()->attempt($credentials, $request->filled('remember'))) {
-            $auth = Auth::user();
+            return response()->json([
+                'message' => 'Account has been locked'
+            ], 401);
 
-            // Check if the user is trying to login with a new device
-            // if it's a new device, log him/out out the temporary save his session
-            // take the user to otp page
-            if (!Device::check()) {
+        } 
+        else if (!Hash::check($request->password, $user->password)) {
 
-                $otp = 111111;
+           $user->incrementLogAttempts();
 
-                Session()->put('otp', $otp);
-                Session()->put('otp_user_id', auth()->id());
-                auth()->logout();
-                return redirect('/otp');
-            }
-            
-            $token = $auth->createToken($auth->role)->plainTextToken;
-
-            Session()->put('tokenkey', $token);
-            $request->session()->regenerate();
-
-
-            $user->update(['logAttempts' => 0]);
-            
-
-            if ($callbackUrl) {
-                return redirect($callbackUrl);
-            }
-
-            return redirect('home')->with('success', 'You have been logged in successfully.');
-        } else if ($exists) {
-            $user->update(compact('logAttempts'));
+           return response()->json([
+            'message' => 'Invalid credentials'
+            ], 401); 
         }
 
+        $cookie = cookie('locked_user_id', $user->id, 525600 * 60);
 
-        return back()->withErrors(['login_info' => 'Invalid credentials']);
+        // Check if the user is trying to login with a new device
+        // if it's a new device, log him/out out the temporary save his session
+        // take the user to otp page
+        if (!Device::check($user->id)) {
+            $otp = 111111;
+            Session()->put('otp', $otp);
+            Session()->put('otp_user_id', $user->id);
+            return response([
+                'redirect' => '/otp'
+            ])->cookie($cookie);
+        }
+        Auth::login($user, $request->remember);
+        $auth = Auth::user();
+        
+        
+        
+       
+        
+        $token = $auth->createToken($auth->role)->plainTextToken;
+
+        Session()->put('tokenkey', $token);
+        $request->session()->regenerate();
+
+        $user->unlockAccount();          
+
+        if ($callbackUrl) {
+            return response()->json([
+                'token' => $token,
+                'message' => 'Login successfully',
+                'redirect' => $callbackUrl
+            ])->cookie($cookie);
+        }
+
+        
+        return response()->json([
+            'token' => $token,
+            'message' => 'Login successfully',
+            'redirect' => '/home'
+        ])->cookie($cookie);
     }
 
 }

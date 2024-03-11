@@ -1,6 +1,7 @@
 <?php
 
 
+
   $role = 'guest';
   if(!isset($module)) {
     $module = 'page';
@@ -53,7 +54,7 @@
   @endforeach
   <script>
     $(function(){
-  offOverlay();
+  offOverlay(6000);
 });
 </script>
   

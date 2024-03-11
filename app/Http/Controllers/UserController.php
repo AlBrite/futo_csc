@@ -29,6 +29,57 @@ class UserController extends Controller
     }
 
 
+    public function update(Request $request) {
+
+        
+        $user = User::findOrFail(auth()->id());
+        
+
+        $validator = Validator::make($request->all(), [
+            'configure' => 'required',
+            'oldPassword' => [
+                'sometimes',
+                
+                function ($attribute, $value, $fail) use ($user) {
+                    if (!Hash::check($value, $user->password)) {
+                        $fail('Your old password is not correct.');
+                    }
+                }
+            ],
+            'password' => [
+                'sometimes', 'min:6', 'confirmed', 'different:oldPassword'
+            ]
+        ],[
+            'password.confirmed' => 'Passwords do not match',
+            'password.min' => 'Password must not be less than :min characters'
+        ]);
+        
+        $configure = $request->configure;
+        
+        if($validator->fails()) {
+            session()->flash($configure, $validator->errors()->first()); // Use 'error' as key and first error message
+            return redirect()->back();
+          }
+
+
+        if ($configure === 'password') {
+            
+            $user->fill([
+                'password' => Hash::make($validator['password'])
+            ])->save();
+    
+            session()->flash('passsword', 'Your password has been updated successfully.');
+            return redirect()->back();
+        }
+
+      
+
+        dd($request);
+
+       
+    }
+
+
 
     /**
      * Display user profile picture

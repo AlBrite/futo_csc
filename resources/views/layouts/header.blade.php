@@ -2,7 +2,7 @@
     $authUser = \App\Models\User::active();
 
 @endphp
-<header id="mainheader">
+<header id="mainheader" class="print:hidden">
     <div class="flex items-center">
         <span
             class="sidebar-toggler material-symbols-rounded text-body-800 cursor-pointer hover:text-[var(--primary-700)] transition">
@@ -14,7 +14,7 @@
                 <p class="font-size-2 text-body-600 dark:text-white font-bold relative -bottom-[2px]">Department of
                     Computer Science</p>
                 <p class="font-size-1 text-body-400 dark:text-white/60 font-semibold  relative -top-[2px]">Federal
-                    University of Technolog, Owerri</p>
+                    University of Technology, Owerri</p>
             </div>
         </div>
     </div>
@@ -43,9 +43,10 @@
                     </label>
                 </div>
             </span>
-            <div class="relative flex" ng-controller="ProfileCardController">
+            @auth
+            <div class="relative flex items-center" ng-controller="ProfileCardController">
                 <x-profile-pic :user="$authUser" alt="user_img" class="w-10 h-10 object-cover rounded-full" />
-                <div class="flex center">
+                <div class="center">
                     <span ng-click="toggleProfileCard()" ng-bind="open ? 'expand_less' : 'expand_more'" class="material-symbols-rounded text-body-800 cursor-pointer select-none hover:text-[var(--primary-700)]">
                         expand_more
                     </span>
@@ -101,6 +102,7 @@
                     </div>
                 </div>
             </div>
+            @endauth
 
 
         </div>

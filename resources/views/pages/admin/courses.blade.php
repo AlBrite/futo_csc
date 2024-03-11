@@ -29,7 +29,7 @@
             <div class="scroller">
                 <div class="lg:p-8">
 
-                    <form class="grid grid-cols-3 place-items-center gap-3 w-full flex-wrap mb-4">
+                    <form class="flex gap-3 w-full mb-4">
                         <div class="select mr-2">
                             <select name="level" id="level" ng-model="level" title="level" class="rounded" ng-model="level"
                                 ng-change="loadCourseOnChange()" tips="Choose Level">
@@ -56,7 +56,7 @@
                     <div ng-show="courses.length == 0" class="grid grid-cols-1 gap-3">
                         @for ($i = 0; $i < 4; $i++)
                             <div
-                                class="loading-skeleton flex card border rounded-md overflow-clip cursor-pointer dark:border-gray-700 group-hover:bg-slate-500">
+                                class="loading-skeleton flex card border rounded-md overflow-clip cursor-pointer dark:border-gray-700 group-hover:bg-slate-500 dark:!bg-zinc-950">
                                 <div class="w-24 skeleton"></div>
                                 <div class="p-2 flex flex-col gap-2 justify-center flex-1">
                                     <p class="text-transparent font-bold skeleton min-w-[100%]"> .</p>
@@ -72,7 +72,7 @@
                         <div ng-repeat="course in courses track by course.id">
                             <div ng-click="loadCourse($event)" data-id="{% course.id %}"
                                 ng-class="{'active':course.id==active_id}"
-                                class="group eachcourse lg:flex card border rounded-lg overflow-clip cursor-pointer dark:border-gray-700 group-hover:bg-slate-500 relative">
+                                class="group eachcourse lg:flex card border rounded-lg overflow-clip cursor-pointer dark:border-gray-700 group-hover:bg-slate-500 relative dark:!bg-zinc-950">
                                 <img src="{{ asset('svg/course_image_default.svg') }}"
                                     class="w-full h-full lg:w-24 lg:h-24 object-cover" alt="course-image">
                                 <div
@@ -148,25 +148,25 @@
                                                 class="col-span-1 p-3 flex center font-bold bg-orange-200 dark:bg-orange-900">
                                                 20%
                                             </span>
-                                            <span class="col-span-1 p-3 flex center font-bold bg-secondary-200">
+                                            <span class="col-span-1 p-3 flex center font-bold bg-blue-200">
                                                 20%
                                             </span>
                                             <span
-                                                class="col-span-3 p-3 flex center font-bold bg-primary-200 dark:bg-green-800 rounded rounded-r-full">
+                                                class="col-span-3 p-3 flex center font-bold bg-green-200 dark:bg-green-800 rounded rounded-r-full">
                                                 60%
                                             </span>
                                         </div>
                                         <div class="flex items-center gap-4">
                                             <div class="flex items-center gap-1 font-semibold text-body-500 text-sm">
-                                                <div class="w-3 h-3 bg-accent-200 rounded-full"></div>
+                                                <div class="w-3 h-3 bg-orange-200 dark:bg-orange-900 rounded-full"></div>
                                                 test
                                             </div>
                                             <div class="flex items-center gap-1 font-semibold text-body-500 text-sm">
-                                                <div class="w-3 h-3 bg-secondary-200 rounded-full"></div>
+                                                <div class="w-3 h-3 bg-blue-200 rounded-full"></div>
                                                 practical
                                             </div>
                                             <div class="flex items-center gap-1 font-semibold text-body-500 text-sm">
-                                                <div class="w-3 h-3 bg-primary-200 rounded-full"></div>
+                                                <div class="w-3 h-3 bg-green-200 rounded-full"></div>
                                                 exam
                                             </div>
                                         </div>
@@ -179,7 +179,7 @@
                                             <span
                                                 class="col-span-3 p-3 flex center font-bold bg-orange-200 dark:bg-orange-900">30%</span>
                                             <span
-                                                class="col-span-7 p-3 flex center font-bold bg-primary-200 dark:bg-green-800 rounded-r-full">70%</span>
+                                                class="col-span-7 p-3 flex center font-bold bg-green-200 dark:bg-green-800 rounded-r-full">70%</span>
                                         </div>
                                         <div class="flex items-center gap-4">
                                             <div class="flex items-center gap-1 font-semibold text-body-500 text-sm">
@@ -187,7 +187,7 @@
                                                 test
                                             </div>
                                             <div class="flex items-center gap-1 font-semibold text-body-500 text-sm">
-                                                <div class="w-3 h-3 bg-primary-200 rounded-full"></div>
+                                                <div class="w-3 h-3 bg-green-200 rounded-full"></div>
                                                 exam
                                             </div>
                                         </div>
@@ -205,7 +205,7 @@
 
                             </div>
                             <div>
-                                <a class="btn-primary"
+                                <a class="btn btn-primary"
                                     href="/admin/course/edit?course_id={% active_course.id %}&semester={% semeseter %}&session={% active_course.session %}&level={% active_course.level %}">Edit
                                     Course Details</a>
                             </div>

@@ -1,4 +1,50 @@
 
+function popup_alert(obj) {
+  const popup = $('.popup-alert');
+
+
+  let type = obj.type;
+  const icons = {
+    success: 'task_alt',
+    error: 'error',
+    warning: 'warning',
+    info: 'info',
+    message: 'feedback',
+    danger: 'dangerous'
+  };
+  const colors = {
+    success: 'green',
+    error: 'red',
+    warning: 'orange',
+    info: 'blue',
+    message: 'zinc',
+    danger: 'red'
+  };
+  if (!(type in colors)) {
+    type = 'message';
+  }
+  const color = colors[type];
+  const icon = icons[type];
+
+  const classList = popup.attr('class');
+  const matchBG = classList.match(/\bb-([a-z0-9\-]+)\b/);
+  const matchTEXT = classList.match(/\btext-([a-z0-9\-]+)\b/);
+
+  if (matchTEXT) {
+    popup.removeClass(matchTEXT);
+  }
+  if (matchBG) {
+    popup.removeClass(matchBG);
+  }
+  popup.addClass(`bg-${color}-100`);
+  popup.addClass(`text-${color}-600`);
+
+  popup.empty();
+  popup.append($('<span>').addClass('material-symbols-rounded').text(icon));
+  popup.append($('<span>').text(obj.message));
+
+}
+window.popup_alert = popup_alert;
 
 function addEvent(selector, callback, event = 'click') {
   const select = document.querySelectorAll(selector);
@@ -223,7 +269,7 @@ jQuery(document).ready(function(){
   var $ = jQuery;
     
   function load() {
-    $('.scroller').each(function(){
+    $('.scrollerx').each(function(){
       const top = $(this).offset().top;
       const height = window.innerHeight;
 
@@ -273,25 +319,26 @@ jQuery(document).ready(function(){
 
 });
 
-const menuToggler = document.querySelector('.sidebar-toggler');
+$(document).on('click', '.sidebar-toggler', function(e){
+  const menu = $('.sidebar').eq(0);
+  const display = menu.css('display')
+  if (window.innerWidth > 1024) {
+   if (!menu.is('.minimized')) {
+     menu.toggleClass('activate-hovering'); 
+   }
+    menu.toggleClass('closed-sidebar')
+  
+  }
+  else {
+   if (display == 'none') {
+     menu.css('display','flex');
+   } else {
+     menu.hide();
+   }
+  }
+});
 
-if (menuToggler) {
-  menuToggler.addEventListener('click', () => {
-   const menu = document.querySelector('.sidebar');
-   if (window.innerWidth > 1024) {
-     menu.classList.toggle('activate-hovering'); 
-     menu.classList.toggle('closed-sidebar')
-   
-   }
-   else {
-    if (menu.style.display == 'none') {
-      menu.style.display = 'flex';
-    } else {
-      menu.style.display = 'none';
-    }
-   }
-  });
-}
+
 $(document).on('mouseenter mouseleave', '.sidebar.activate-hovering', function(e) {
   $(this).toggleClass('closed-sidebar');
 })
@@ -339,18 +386,77 @@ window.onbeforeunload = ()=>{
 }
 
 $(function(){
-  $(".sidebar .has-menu").on("click", function(e) {
+  // $(".sidebar .has-menu").on("click", function(e) {
     
-    $(".sidebar .has-menu").not(this).removeClass('active');
-    $(this).toggleClass('active');
+  //   $(".sidebar .has-menu").not(this).removeClass('active');
+  //   $(this).toggleClass('active');
 
-  });
+  // });
   $(".sentence-case").each(function() {
-      var text = $(this).text().toLowerCase();
+      var text = $(this).text().trim().toLowerCase();
       $(this).text(text.charAt(0).toUpperCase() + text.slice(1));
   });
 });
-$('.h-avail, .h-center').each(function(e){
+
+$(document).ready(() => {
+  const lastHeights = {};
+  const debounceTime = 100; // Default debounce time
+/*
+var element = document.getElementById('element');
+    var styles = window.getComputedStyle(element);
+    var paddingTop = parseFloat(styles.paddingTop);
+    var paddingBottom = parseFloat(styles.paddingBottom);
+    var marginTop = parseFloat(styles.marginTop);
+    var marginBottom = parseFloat(styles.marginBottom);
+    var borderHeight = element.clientHeight - element.offsetHeight;
+*/
+  function adjustElementHeight() {
+     
+
+      $('.scroller').each(function(index) {
+        const $element = $(this);
+        const elementOffsetTop = $element.offset().top;
+        const screenHeight = $(window).innerHeight();
+        const styles = window.getComputedStyle($element[0]);
+        var paddingTop = parseFloat(styles.paddingTop);
+        var paddingBottom = parseFloat(styles.paddingBottom);
+        var marginTop = parseFloat(styles.marginTop);
+        var marginBottom = parseFloat(styles.marginBottom);
+        var borderHeight = $element[0].clientHeight - $element[0].offsetHeight;
+        let maxHeight = screenHeight - elementOffsetTop - borderHeight;
+        // - marginTop - marginBottom - paddingBottom - paddingTop;
+        
+        
+        if ($(this).is('.test')) {
+          alert('Border'+maxHeight);
+        }
+        
+
+        // Only set max-height if it has changed
+        if (maxHeight !== lastHeights[index]) {
+            $element.css({
+                'max-height': maxHeight + 'px',
+                'transition': 'max-height 0.3s ease' // Smooth transition
+            });
+            lastHeights[index] = maxHeight;
+        }
+    });
+
+  }
+
+  setTimeout(() => {
+    adjustElementHeight();
+  }, 100);
+
+  // Debounce resize event for performance
+  let timeout;
+  $(window).resize(function() {
+      clearTimeout(timeout);
+      timeout = setTimeout(adjustElementHeight, debounceTime);
+  });
+});
+
+$('.h-availx, .h-center').each(function(e){
   setTimeout(()=>{
     const offset = $(this).offset();
     const averiageHeight = Math.ceil($(this).innerHeight()) / 3;
@@ -456,6 +562,93 @@ $(function(){
     
   })
 
+
+  $("[class*='sticky']").each(function(){
+    const hasFixed = /\b(top|bottom)-([a-zA-Z0-9]+)\b/.test($(this).attr('class'));
+    const positionTop = $(this).position().top;
+    if (!hasFixed && positionTop === 0) {
+
+      $(this).css({
+        top: '0px'
+      });
+      
+    }
+  });
+
+
+
+  $(document).on('input', '[data-session]', function(e) {
+    const val = $(this).val();
+    const increment = parseInt($(this).data('session'));
+    const last = val.charAt(val.length - 1);
+   
+    var value = val.replace(/[^0-9\/]/, '');
+    let year = parseInt(value);
+    const len = value.length;
+    if (e.originalEvent?.inputType === 'insertText' && (last === '/' && /^\d+\/$/.test(val) || len === 4)) {
+      value += "/";
+      value += year + increment;
+    }
+    else if (e.originalEvent?.inputType === 'deleteContentBackward') {
+      value = value.replace(/(^|\/)\d+$/, '');
+
+    }
+    
+    $(this).val(value.replace(/[\/]+/, '/').slice(0, 9));
+    
+    if (value.length === 9) {
+      //$(this).blur();
+      $(this).closest('form').find('input:eq(' + ($(this).index() + 1) + ')').focus();
+    }
+  });
+
+  $('[data-session]').focus(function(e) {
+    var input = $(this).get(0);
+    input.setSelectionRange(input.value.length, input.value.length);
+  });
+  $('[data-session]').on("paste", function (event) {
+    event.preventDefault();
+    const increment = parseInt($(this).data('session'));
+
+    const pastedData = event.originalEvent.clipboardData.getData("text");
+    const matcher = pastedData.trim().match(/^(\d+)(\/(\d+))?$/);
+    if (matcher) {
+      const [ , start, separator, end] = matcher;
+      const start_year = parseInt(start);
+      const end_year = parseInt(end || start_year + increment);
+      
+      if ((end_year - start_year) === increment) {
+        $(this).val(`${start_year}/${end_year}`);
+        
+        $(this).closest('form').find('input:eq(' + ($(this).index() + 1) + ')').focus();
+      }
+
+    }
+
+  });
+
+  $('[data-session]').on('change', function(e) {
+    const value = $(this).val();
+    const increment = parseInt($(this).data('session'));
+    const matcher = value.trim().match(/^(\d+)(\/(\d+))?$/);
+    if (matcher) {
+      const [ , start, separator, end] = matcher;
+      const start_year = parseInt(start);
+      const end_year = parseInt(end || start_year + increment);
+      
+      if ((end_year - start_year) === increment) {
+        $(this).val(`${start_year}/${end_year}`);
+        
+        $(this).closest('form').find('input:eq(' + ($(this).index() + 1) + ')').focus();
+      }
+      else {
+        $(this).val('');
+        $(this).focus();
+      }
+    }
+  });
+
   
 
 })
+

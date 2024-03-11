@@ -102,15 +102,35 @@ async function api(page, data, init) {
       
       // const text = await response.text();
       // console.log(text, data);
+
+      const fetchData = (response) => {
+        return new Promise(async(resolve, reject) => {
+          var data, process;
+          data = process = await response.text();
+          try {
+            return resolve(JSON.parse(process)); 
+          } catch(e) {
+            return reject(data);
+          }
+        });
+      }
+
+      const d = fetchData(response);
       
 
       if (!response.ok) {
-        throw new Error(response.text());
+        return d.then(res => Promise.reject(res))
+          .catch(err => Promise.reject(err));
       }
-     
-      return response.json();
+      return d.then(res => Promise.resolve(res))
+          .catch(err => Promise.reject(err));
+      //return response.json();
+        
     })
     .then(data => {
+      if ('redirect' in data) {
+        window.location.href = data.redirect;
+      }
       if (['/login', 'register'].includes(page) && 'access_token' in data) {
         localStorage.setItem('access_token', data.access_token);
       }

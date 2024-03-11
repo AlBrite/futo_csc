@@ -181,6 +181,43 @@ class Student extends Model
     }
     
 
+    public function carryoverCourses() : array {
+
+        $results = Result::where('reg_no', $this->reg_no)
+            ->where('remark', 'FAILED')
+            ->get();
+
+        $failed = [];
+        
+        foreach($results as $result) {
+            $fetchPassedResults = Result::where('course_id', $result->course_id)
+                ->where('reg_no', $result->reg_no)
+                ->where('remark', 'PASSED')
+                ->first();
+
+            if (!$fetchPassedResults) {
+                $failed[] = $result;
+            }
+
+        }
+        
+        return $failed;
+    }
+
+
+
+    public function getMaterials() {
+        $materials = Enrollment::where('reg_no', $this->reg_no)
+            ->join('courses', 'courses.id', '=', 'enrollments.course_id')
+            ->join('materials', 'materials.course_code', '=', 'courses.code')
+            ->orderBy('materials.created_at', 'DESC')
+            
+            ->simplePaginate(4);
+            
+        return $materials;
+
+    }
+
 
    
 

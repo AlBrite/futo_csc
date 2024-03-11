@@ -10,6 +10,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ResultsController;
+use App\Models\Todo;
 
 /*
 HTTP_OK (200): The request has succeeded.
@@ -46,7 +47,9 @@ Route::get('/tokens/create', function (Request $request) {
 
 
 
-Route::get('/login', [AuthController::class, 'apiLogin']);
+// Route::get('/login', [AuthController::class, 'apiLogin']);
+
+Route::post('/dologin', [AuthController::class, 'api_login']);
 
 Route::get('/register', 'AuthController@register');
 
@@ -86,9 +89,7 @@ Route::post('/course/create', [CourseController::class, 'api_createCourse']);
 
 Route::get('/student_course_details_home', [CourseController::class, 'student_course_details_home'])->middleware('auth');
 
-Route::get('/todo/complete', function(Request $request) {
-    return [$request->user];
-});
+
 
 // show students
 Route::post('/student', [StudentController::class, 'getStudent']);
@@ -104,6 +105,17 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
     Route::post('/save-results', [ResultsController::class, 'save_results']);
 
     Route::post('/classes', [ClassController::class, 'api_index']);
+
+    Route::post('/todo/complete', function(Request $request) {
+        $request->validate([
+            'todo_id' => 'required'
+        ]);
+        $todo_id = $request->todo_id;
+        $todo = Todo::find($todo_id);
+        $todo->complete = !$todo->complete;
+        $todo->save();
+        return [$todo];
+    });
 
 });
 // Class Controllers

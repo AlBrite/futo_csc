@@ -12,11 +12,142 @@ use App\Models\Admin;
 use App\Models\Course;
 use App\Models\Enrollment;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Session;
+
+
 
 class ResultsController extends Controller
 {
 
     public function uploadExcel(Request $request)
+    {
+        $matcher = [
+            'Reg No.' => 'reg_no',
+            'LAB' => 'lab',
+            'TEST' => 'test',
+            'EXAM' => 'exam',
+            'TOTAL' => 'score'
+        ];
+
+        $request->validate([
+            "level" => "required",
+            "semester" => "required",
+            "course" => "required",
+            "session" => "required"
+        ]);
+        $level = $request->level;
+        $semester = $request->semester;
+        $course = $request->course;
+        $session = $request->session;
+
+        if ($processed = $this->processResults('result')) {
+            
+            Result::insert($processed);
+            
+            return redirect()->back()->with('success', 'Successfully uploaded results');
+        }
+
+            
+        return redirect()->back()->with('error', 'Failed to process results');
+    }
+
+    public function processResults($name) : ?array {
+        // the keys are the matcher, they are the names of the column
+        // the values are the column name of the table to store the results 
+
+        $required_columns = [
+            //key  => value
+            'regno' => 'reg_no',
+            'lab' => 'lab',
+            'test' => 'test',
+            'exam' => 'exam',
+            'total' => 'score'
+        ];
+
+
+        $request   =    request();
+        $file      =    $request->file($name);
+        $level     =    $request->level;
+        $semester  =    $request->semester;
+        $course    =    $request->course;
+        $session   =    $request->session;
+
+
+        // Convert file to Array
+        $data = Excel::toArray([], $file);
+
+        $rowMatched = [];
+
+        // clean up the column data, by removing non-alphanumeric and underscore characters
+        // and converting the column to lower case
+        $cleanValue = fn($value) => strtolower(preg_replace('/[^a-zA-Z0-9_]+/', '', $value));
+
+        $foundRow = false;
+        $retrieveColumns = [];
+        
+
+
+        foreach ($data[0] as $rowNumber => $row) {
+
+            foreach($row as $col) {
+                // clean up the column data, by removing non-alphanumeric and underscore characters
+                // and converting the column to lower case
+                $resultColumn = $cleanValue($col);
+
+                
+                if (array_key_exists($cleanValue($col), $required_columns)) {
+                    // if found, that means the row is the header,
+                    // which contains other names, like results, remarks and others
+
+                    foreach($row as $n => $column) {
+                        $cleanColumn = $cleanValue($column);
+                        if (!array_key_exists($cleanColumn, $required_columns)) {
+                            continue;
+                        }
+                        
+                        $retrieveColumns[$n] = $required_columns[$cleanColumn];
+                    }
+                    $foundRow = $rowNumber;
+                    break;
+
+                }
+            }
+
+        }
+
+
+        if ($foundRow === false) {
+            return null;
+        }
+        
+        
+        $results = array_splice($data[0], $foundRow + 2);
+
+        
+        $newResult = [];
+        foreach($results as $result) {
+            $append = [
+                'level'      =>  $level,
+                'semester'   =>  $semester,
+                'course_id'  =>  $course,
+                'session'    =>  $session 
+            ];
+
+            foreach($retrieveColumns as $index => $retrieved) {
+                $append[$retrieved] = $result[$index];
+            }
+            $newResult[] = $append;
+        }
+
+        return $newResult;
+        
+
+    }
+
+
+
+
+    public function uploadExcelx(Request $request)
     {
         $matcher = [
             'Reg No.' => 'reg_no',
@@ -59,6 +190,7 @@ class ResultsController extends Controller
 
             foreach($row as $col) {
                 if (array_key_exists($col, $matcher)) {
+                    dd($col);
                     foreach($row as $n => $column) {
                         if (!array_key_exists($column, $matcher)) {
                             continue;
@@ -369,7 +501,7 @@ class ResultsController extends Controller
                                  ->on('results.session',   '=', 'enrollments.session')
                                  ->on('results.level',     '=', 'enrollments.level');
                     })
-                    ->where('status', $equality, 'COMPLETED')
+                    ->where('results.status', $equality, 'COMPLETED')
                     ->where('enrollments.session', $session)
                     ->get();
 

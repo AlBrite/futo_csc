@@ -7,51 +7,55 @@
     if (!is_numeric($advisor_id)) {
         $advisor_id = 'null';
     }
-    
+
 @endphp
 <x-template nav="advisors" title="Admin - Advisors Manager">
     <div ng-controller="AdvisorController" ng-init="init()">
-        <div class="md:flex justify-between items-stretch max-h-full min-h-full overflow-hidden">
+        <div class="md:flex justify-between items-stretch h-full">
             <div ng-cloak ng-show="!advisor || winLarge"
-                class="md:w-[380px] bg-slate-50 border-r dark:border-black bg-zinc-300/25">
-                <div>
-                    <form
-                        class="flex items-center justify-between gap-2 w-full flex-wrap  p-5 border-b dark:border-white/25 ">
+                class="md:w-[380px] bg-slate-50 border-r dark:border-black dark:bg-transparent">
+                <div class="h-avail scroller">
+                    <div class=" bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
+                        <form
+                            class="flex items-center justify-between gap-2 w-full flex-wrap  p-5 border-b dark:border-white/25 ">
 
-                        <div class="flex-1">
-                            <input type="search"
-                                class="input w-full bg-white dark:bg-zinc-600 !py-3 !px-4 !rounded-full"
-                                placeholder="Enter Advisor's Name" />
-                        </div>
+                            <div class="flex-1">
+                                <input type="search"
+                                    class="input w-full bg-white dark:bg-zinc-600 !py-3 !px-4 !rounded-full"
+                                    placeholder="Enter Advisor's Name" />
+                            </div>
 
-                    </form>
-
-                    <div class="flex flex-col h-full  rounded-md p-4">
-                        <div class="scroller">
-                            <table class="border-collapse" style="border-collapse: collapse";>
-                                <tbody>
-                                    @foreach ($advisors as $advisor)
-                                        <tr advisor_id="{{ $advisor->id }}" ng-click="show({{ $advisor->id }})"
-                                            class="hover:bg-green-100 cursor-pointer gap-3 border-b border-slate-200 dark:hover:bg-zinc-600/70 rounded-md last:border-transparent items-center">
-                                            <td align="center" class="py-4 pl-3">
-                                                <img src="{{ $advisor->picture() }}" alt="PIC"
-                                                    class="w-10 h-10 rounded-full object-cover" />
-                                            </td>
-                                            <td>
-                                                {{ $advisor->user->name }}
-                                            </td>
-                                            <td class="text-center">
-                                                ID<br>
-                                                ADV-000{{ $advisor->user->unique_id }}
-                                            </td>
-                                            <td class="text-center pr-3">
-                                                Students<br>
-                                                1000
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                        </form>
+                        <div class="scroller h-full">
+                            <div class="flex flex-col h-full  rounded-md">
+                                <div class="scroller">
+                                    <table class="border-collapse" style="border-collapse: collapse";>
+                                        <tbody>
+                                            @foreach ($advisors as $advisor)
+                                                <tr advisor_id="{{ $advisor->id }}"
+                                                    ng-click="show({{ $advisor->id }})"
+                                                    class="hover:bg-green-100 cursor-pointer gap-3 border-b border-slate-200 dark:hover:bg-zinc-600/70 rounded-md last:border-transparent items-center">
+                                                    <td align="center" class="py-4 pl-3">
+                                                        <img src="{{ $advisor->picture() }}" alt="PIC"
+                                                            class="w-10 h-10 rounded-full object-cover" />
+                                                    </td>
+                                                    <td>
+                                                        {{ $advisor->user->name }}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        ID<br>
+                                                        ADV-000{{ $advisor->user->unique_id }}
+                                                    </td>
+                                                    <td class="text-center pr-3">
+                                                        Students<br>
+                                                        1000
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -73,9 +77,9 @@
 
                     <div ng-show="advisor">
 
-                        <div class="flex flex-col lg:m-5 bg-white dark:bg-inherit rounded-md p-8">
+                        <div class="flex h-full flex-col">
                             <div
-                                class="bg-slate-50/10 h-36 flex flex-col lg:flex-row text-center justify-center gap-3 items-center lg:text-left lg:justify-start p-4 relative border-b-4">
+                                class="h-36 flex flex-col lg:flex-row text-center justify-center gap-3 items-center lg:text-left lg:justify-start p-4 relative border-b-4">
                                 <div>
                                     <p class="text-2xl lg:text-3xl font-bold mb-3" ng-bind="advisor.user.name"></p>
                                     <p class="font-bold" ng-bind="advisor.staff_id"></p>
@@ -84,7 +88,7 @@
                                 <img src="{% advisor.image %}"
                                     class="w-28 h-28 object-cover rounded-full absolute right-10 -bottom-[2.8rem] border-4" />
                             </div>
-                            <div class="flex-1 bg-white dark:bg-zinc-800">
+                            <div class="flex-1 ">
                                 <div>
                                     <div class="p-4 my-2">
                                         <div class="mb-1 font-semibold text-slate-900 dark:text-slate-200">Basic
@@ -166,7 +170,7 @@
                                 </div>
 
                                 <div class="flex justify-end px-4 pb-3">
-                                    <a  href="/admin/advisor/edit?advisor_id={%advisor.id%}" class="btn-primary">
+                                    <a href="/admin/advisor/edit?advisor_id={%advisor.id%}" class="btn btn-primary">
                                         Edit Advisor Details
                                     </a>
                                 </div>
@@ -178,10 +182,10 @@
 
                     </div>
 
-                    <div ng-show="!advisor" view-student-skeleton>
+                    <div profile-skeleton>
                     </div>
 
-                   
+
                 </div>
 
             </div>

@@ -114,7 +114,7 @@
                 <table class="visible-on-print print:text-black responsive-table whitespace-nowrap w-full">
                     <thead class="print:bg-white print:text-black">
                         <th class="w-10">S/N</th>
-                        <th>Name</th>
+                        <th class="text-left">Name</th>
                         <th>Reg. No.</th>
                         <th class="w-10">Program</th>
                         <th class="w-10">Test</th>
@@ -130,7 +130,7 @@
                         @foreach ($records as $record)
                             <tr>
                                 <td>{{ $n }}</td>
-                                <td>{{ $record->name }}</td>
+                                <td class="text-left">{{ $record->name }}</td>
                                 <td>{{ $record->reg_no }}</td>
                                 <td>{{ $record->code }}</td>
                                 <td>20</td>

@@ -7,7 +7,12 @@ export const content = [
   './resources/**/*.svg',
 ];
 export const theme = {
-  extend: {},
+  extend: {
+    colors: {
+      'primary': '#10a37f',
+      // primary hover: rgba(26,127,100,var(--tw-bg-opacity))
+    }
+  },
 };
 export const plugins = [
   // require('tailwind-scrollbar'),

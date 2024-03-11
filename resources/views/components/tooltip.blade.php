@@ -8,5 +8,5 @@ if (isset($relative)) {
 
 <span class="tooltip">
   {{$slot}}
-  <span class="tooltip-label dir-{{isset($direction)?$direction:'bottom'}}" {!! $relative_attr !!}>{{$label}}</span>
+  <span class="tooltip-label dir-{{isset($direction)?$direction:'bottom'}}" {!! $relative_attr !!} {{$attributes}}>{{$label}}</span>
 </span>

@@ -18,5 +18,5 @@
       default => '!bg-red-200 !text-red-600',
     };
   @endphp
-  <div class="text-center !text-sm px-2 py-1 rounded-md {{$class}} {{$color}}" id="{{$id}}" style="{{$style}}">{{$slot}}</div>
+  {{-- <div class="text-center !text-sm px-2 py-1 rounded-md {{$class}} {{$color}}" id="{{$id}}" style="{{$style}}">{{$slot}}</div> --}}
 @endif

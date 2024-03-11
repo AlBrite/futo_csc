@@ -15,7 +15,7 @@
     $advisor = $student->advisor;
 @endphp
 <x-template nav='courses'>
-    <div class="h-avail" ng-controller="CourseRegistrationController">
+    <div class="scroller" ng-controller="CourseRegistrationController">
         <x-page-header>
             Course Registration
         </x-page-header>

@@ -288,10 +288,33 @@ class CourseController extends Controller
         return $course;
         
     }
+
+
+    private function cloneCourse(Course $course, array $data) {
+       
+        $course_data = array_merge([
+            "name" => $course->name,
+            "code" => $course->code,
+            "outline" => $course->outline,
+            "mandatory" => $course->mandatory,
+            "grouping_id" => $course->grouping_id,
+            "semester" => $course->semester,
+            "status" => $course->status,
+            "level" => $course->level,
+            "exam" => $course->exam,
+            "test" => $course->test,
+            "practical" => $course->practical,
+            "units" => $course->units,
+            "prerequisite" => $course->prerequisite,
+        ], $data);
+
+       return Course::create($course_data);
+    }
     
     
     public function updateCourse(Request $request)
     {
+       
         
         $formData =  $request->validate([
             'id' => 'required',
@@ -342,12 +365,34 @@ class CourseController extends Controller
 
         
         $data = Arr::only($formData, $this->fillable);
+
+        $columnsToCompare = ['units', 'code', 'test', 'lab', 'exam'];
         $data['units'] = $request->practical + $request->exam + $request->test;
         $data['code'] = trim(strtoupper($data['code']));
         $data['name'] = ucfirst(trim($data['name']));
         $data['grouping_id'] = $request->level + ($request->semester === 'rain' ? 2 : 1);
+
+        $columnChanged = false;
+
+        foreach($columnsToCompare as $column) {
+            if ($course->$column !== $data[$column]) {
+                $columnChanged = true;
+                break;
+            }
+        }
+
         
-        $course->update($data);
+
+        
+        if ($columnChanged) {
+            $course->status = 'inactive';
+            $course->update();
+            $course = $this->cloneCourse($course, $data);
+        }
+        else {
+            $course->update($data);
+            
+        }
 
 
         

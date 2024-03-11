@@ -4,12 +4,8 @@
         Results
     </x-page-header>
 
-    <h1 class="text-secondary-800 font-semibold">
-         Results
-    </h1>
-
     <div class="print:visible">
-        <div class="flex flex-col center">
+        <div class="flex flex-col items-center">
             <img src="http://127.0.0.1:8000/images/futo-log.png" alt="futo-logo" width="35">
             <h1 class="text-sm font-semibold text-body-400 md:text-base xl:text-lg print:text-black">
                 FEDERAL UNIVERSITY OF TECHNOLOGY, OWERRI
@@ -49,7 +45,7 @@
     </form>
     <div class=" flex flex-col">
         @if (!$approved || count($approved) === 0)
-            <div class="flex items-center justify-center h-center text-3xl opacity-25 font-extrabold">
+            <div class="flex items-center justify-center text-3xl opacity-25 font-extrabold mt-10 print:mt-0">
                 <div>
                     @if (!$unapproved && !$approved)
                         Select Section and Semester above to view results
@@ -62,12 +58,12 @@
                 </div>
             </div>
         @else
-            <div class="box rounded-md shadow-lg overflow-clip">
-                <div class="box-body !pt-0">
-                    <table class="overflow-y-visible responsive-table visible-on-print">
+            <div class="cd">
+                <div class="cd-b table">
+                    <table class="overflow-y-visible visible-on-print">
                         <thead>
                             <tr>
-                                <th class="w-20">Course Code</th>
+                                <th class="w-24">Course Code</th>
                                 <th>Course Title</th>
                                 <th class="w-20">Units</th>
                                 <th class="w-20">Test</th>
@@ -102,7 +98,7 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between w-full">
+            <div class="flex items-center justify-between w-full mt-5">
                 <div class="flex items-center gap-2 rounded bg-primary-50 text-sm p-2 print:visble">
                     <p class="text-body-300">GPA:
                         <span class="text-black-400 font-semibold">{{ $GPA['GPA'] }}</span>
@@ -113,8 +109,8 @@
                 </div>
 
                 <!-- Display this button only if there are results to show -->
-                <button type="button" @click="handlePrint"
-                    class="btn bg-[var(--primary)] text-white hover:bg-[var(--primary-700)] rounded text-sm">Print
+                <button type="button" ng-click="print()"
+                    class="btn btn-primary">Print
                     Result
                 </button>
                 <!-- Display this button only if there are results to show -->

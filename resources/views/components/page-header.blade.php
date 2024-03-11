@@ -1,4 +1,4 @@
-<div class="page-header">
+<div class="page-header print:hidden">
   <a class="lg:hidden" href="{{url()->previous()}}">
     <span class="material-symbols-rounded hover:!text-green-500 relative -bottom-[1.5px]">arrow_back</span>
   </a>

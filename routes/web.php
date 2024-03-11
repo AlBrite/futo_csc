@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\DBExportController;
-use App\Models\{Student,Course, Result, AcademicRecord, AcademicSet, Admin, Enrollment, User};
+use App\Models\{Student,Course, Result, AcademicRecord, AcademicSet, Admin, Device, Enrollment, User};
 use App\Http\Controllers\ {
     AuthController,
     ModeratorController,
@@ -19,6 +19,7 @@ use App\Http\Controllers\ {
     UserController,
     LecturerController,
     MailController,
+    MaterialController,
     TestController
 };
 use Illuminate\Http\Request;
@@ -43,7 +44,13 @@ Route::get('/', fn() => redirect(auth()->check()?'/home':'/login'));
     Route::get('/generate', [TestController::class, 'generate']);
     Route::get('/calender', fn() => view('components.calendar'));
     Route::get('/export', [DBExportController::class, 'exportToJson']);
-    Route::get('/test', fn() => view('pages.test'));
+    Route::get('/test', function() {
+        //return redirect('/home')->with('success', 'Tested');
+        return view('pages.test');
+    });
+    Route::get('/info', function(){
+        echo phpinfo();
+    });
 
 
 /*********GUEST ROUTES***********/
@@ -51,12 +58,23 @@ Route::get('/', fn() => redirect(auth()->check()?'/home':'/login'));
 
         Route::get('/login', [AuthController::class, 'login'])->name('login');
         Route::get('/lost-password', fn() => view('pages.auth.lost-password'))->middleware('guest');
-        Route::get('/otp', fn() => view('pages.auth.otp'));
+        Route::get('/otp',function(){
+        
+            return view('pages.auth.otp');
+    });
         
         Route::post('/dologin', [AuthController::class, 'doLogin']);
         Route::post('/otp', [AuthController::class, 'verifyOTP']);
+        
 
+        Route::get('/lockscreen', function(Request $request){
+                if ($profile = AuthController::locked_user()) {
+                    return view('pages.auth.lockscreen', compact('profile'));
+                }
+                return redirect('/login');
+        });
     });
+
 
 
 
@@ -85,16 +103,49 @@ Route::get('/', fn() => redirect(auth()->check()?'/home':'/login'));
             // Display For uploading of results
             Route::get('/upload-results', fn()=> view('pages.advisor.upload-results'))->middleware('role:mod');
 
+            Route::get('/cgpa_summary', fn() => view('pages.advisor.cgpa-summary-result'))->name('advisor.cgpa_summary')->middleware('role:advisor');
+
             
 
             Route::post('/update/lecturer', [LecturerController::class, 'update'])
                 ->name('update.lecturer');
+
+            Route::get('/material/insert', [MaterialController::class, 'insert'])
+                ->name('insert.material')
+                ->middleware('role:lecturer');
+
+            Route::get('/materials', [MaterialController::class, 'index'])
+                ->name('index.materials');
+
+            Route::post('/material/upload', [MaterialController::class, 'store'])
+                ->name('upload.material')
+                ->middleware('role:lecturer');
+
+            Route::get('/material/{material}', [MaterialController::class, 'show'])
+                ->name('show.material');
 
         /**ADMIN ROUTES**/
 
             Route::get('/admin/courses',  [CourseController::class, 'admin_view_courses'])
             ->name('admin.view-courses')
             ->middleware('role:admin');
+
+            Route::get('/admin/classes', [ClassController::class, 'show_to_admin'])
+                ->name('admin.classes')
+                ->middleware('role:admin');
+
+            Route::get('/admin/class/add', [ClassController::class, 'add'])
+                ->name('admin.add-class')
+                ->middleware('role:admin');
+
+            Route::get('/admin/class/edit', [ClassController::class, 'show_to_admin'])
+                ->name('admin.edit-class')
+                ->middleware('role:admin');
+
+            Route::post('/admin/class/store', [ClassController::class, 'store'])
+                ->name('admin.store-new-class')
+                ->middleware('role:admin');
+
 
             Route::get('/admin/course/add', [CourseController::class, 'add'])
             ->name('admin.add_course')
@@ -147,6 +198,13 @@ Route::get('/', fn() => redirect(auth()->check()?'/home':'/login'));
             ->name('add.lecturer')
             ->middleware('role:admin');
 
+
+
+            Route::get('/timetable', fn() => view('pages.admin.timetable'));
+
+            Route::post('/update', [UserController::class, 'update']);
+           
+
             
             
 
@@ -185,9 +243,7 @@ Route::get('/', fn() => redirect(auth()->check()?'/home':'/login'));
             ->name('update.course');
         
 
-            Route::post('/academicSet/add', [ClassController::class, 'store'])
-                ->name('add.academic_set')
-                ->middleware('role:admin');
+           
 
 
             

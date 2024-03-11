@@ -50,14 +50,14 @@
 @endphp
 
 
-<div class="grid place-content-center grid-cols-1">
+<div class="grid place-content-center grid-cols-1 mt-2">
     @if (count($records) > 0)
         <div class="">
             <table class="visible-on-print print:text-black responsive-table whitespace-nowrap w-full lg:!w-[300px]">
                 <thead class="print:bg-white print:text-black">
                     <tr>
                         <th class="w-10">S/N</th>
-                        <th>Name</th>
+                        <th class="text-left">Name</th>
                         <th>Reg. No.</th>
                         <th class="w-10">Program</th>
                         <th class="w-10">Test</th>
@@ -94,15 +94,15 @@
                         <tr>
 
                             <td>{{ $n }}</td>
-                            <td>{{ $record->name }}</td>
+                            <td class="!text-left">{{ $record->name }}</td>
                             <td>{{ $record->reg_no }}</td>
-                            <td align="center">{{ explode(' ', $record->code)[0] }}</td>
-                            <td align="center">{{ $result ? $result['test'] : '' }}</td>
-                            <td align="center">{{ $result ? $result['lab'] : '' }}</td>
-                            <td align="center">{{ $result ? $result['exam'] : '' }}</td>
-                            <td align="center">{{ $result ? $result['score'] : '' }}</td>
-                            <td align="center">{{ $gradings ? $gradings['alphaGrade'] : '' }}</td>
-                            <td align="center">{{ $result->remark }}</td>
+                            <td>{{ explode(' ', $record->code)[0] }}</td>
+                            <td>{{ $result ? $result['test'] : '' }}</td>
+                            <td>{{ $result ? $result['lab'] : '' }}</td>
+                            <td>{{ $result ? $result['exam'] : '' }}</td>
+                            <td>{{ $result ? $result['score'] : '' }}</td>
+                            <td>{{ $gradings ? $gradings['alphaGrade'] : '' }}</td>
+                            <td>{{ $result->remark }}</td>
                         </tr>
                         @php $n++; @endphp
                     @endforeach

@@ -18,13 +18,7 @@ $class_id = request()->get('class');
             
         </style>
         
-        <div id="advisor-results" class="flex items-center text-sm font-semibold gap-4 text-body-200">
-            <a href="/results" class="active">View Results</a>
-            <a href="/moderator/upload-results">Upload Results</a>
-            <a href="/moderator/cgpa-summary-result">CGPA Summary Result</a>
-            <a href="/moderator/add-result">Manually Add Results</a>
-        </div>
-
+       
         <div class="w-full mt-4">
             <form action="/" method="get" class="flex items-center gap-x-2 w-full relative mb-4">
                 

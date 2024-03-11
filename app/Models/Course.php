@@ -26,44 +26,28 @@ class Course extends Model
     ];
 
 
-    public function allCourses()
-    {
-    }
-
-    public function getLevelCourses(int $level)
-    {
-    }
-    public function getLevelMandatoryCourses(int $level)
-    {
-    }
-
-    public function getLevelElectiveCourses(int $level)
-    {
-    }
-
-    public function getAllCoursesForDepartment(int $department)
-    {
-        return Course::whereNull('department_id')->orWhere('department_id', $department);
-    }
-
-
-    public function getAllCoursesForLevel(int $level, int $department)
-    {
-        return Course::whereNull('department_id')->orWhere('department_id', $department)->addWhere('level', $level);
-    }
 
 
     public function result() {
         return $this->hasOne(Result::class, 'course_id', 'id');
     }
 
+    public static function active() {
+        return Course::where('status', 'active');
+    }
+
+    public static function inActive() {
+        return Course::where('status', 'inactive')->get();
+    }
+
     
+
 
 
 
     public static function getAllCourses()
     {
-        return Course::where('status', 'active')->get();
+        return self::active()->get();
     }
 
     public static function achiveCourse(int $course_id) {
@@ -80,22 +64,25 @@ class Course extends Model
 
     public static function getCourses($level, $semester)
     {
-        return Course::where('level', $level)->where('semester', $semester)->with('enrollments')->orderBy('mandatory', 'desc')->get();
+        return self::active()
+            ->with('enrollments')
+            ->where('level', $level)
+            ->where('semester', $semester)
+            ->orderBy('mandatory', 'desc')
+            ->get();
     }
 
     public static function listCoursesForRegistrations($level, $semester, ?array $borrowed) {
-      ;
+      
         $borrowed ??= [];
         $borrowed = array_filter($borrowed, fn($item) => is_numeric($item));
 
-        return Course::where('level', $level)
-        ->where('semester', $semester)
-        ->orWhereIn('id', $borrowed)
-        ->with('enrollments')
-        ->orderBy('mandatory', 'desc')->get();
-
-
-        Course::getCoursesForRegistration(request()->level, request()->semester, request()->courses);
+        return self::active()
+            ->where('level', $level)
+            ->where('semester', $semester)
+            ->orWhereIn('id', $borrowed)
+            ->with('enrollments')
+            ->orderBy('mandatory', 'desc')->get();
     }
 
 

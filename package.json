@@ -16,6 +16,9 @@
     },
     "dependencies": {
         "alpinejs": "^3.13.5",
-        "jquery": "^3.7.1"
+        "apexcharts": "^3.47.0",
+        "flatpickr": "^4.6.13",
+        "jquery": "^3.7.1",
+        "toastr": "^2.1.4"
     }
 }

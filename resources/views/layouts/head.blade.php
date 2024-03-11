@@ -21,11 +21,15 @@ $styles = [
   $styles = array_unique($styles);
 @endphp
 <meta charset="UTF-8" />
-<title>{{$title??'Futo CSC Portal'}}</title>
+<title>{!!$title??'Futo CSC Portal'!!}</title>
 <meta name="theme-color" content="#000000"/>
+@if (isset($description)) 
+  <meta name="description" content="{!!$description!!}"/>
+@endif
 <link rel="icon" type="image/svg+xml" href="{{asset('svg/logo.svg')}}" />
-@vite('resources/css/app.css')
-<link rel="stylesheet" href="{{asset('styles/styles.css')}}">
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+
+<link rel="stylesheet" href="{{asset('styles/normalize.css')}}">
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.jsxxx"></script>
@@ -38,14 +42,13 @@ $styles = [
     @endif
   @endforeach
 
-
-<script src="https://cdn.tailwindcss.com"></script>
+{{-- 
+<script src="https://cdn.tailwindcss.com"></script> --}}
 
 <script src="{{asset('scripts/api.js')}}"></script>
-<link href="{{ asset('css/app.css') }}" rel="stylesheet"/>
-<link href="{{ asset('build/assets/app-0cb9bd85.css')}}"/>
 <meta name="csrf_token" content="{{csrf_token()}}"/>
   
+
 @if(file_exists(public_path($style)))
   <link href="{{ asset($style) }}" rel="stylesheet"/>
 @endif
